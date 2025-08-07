@@ -16,10 +16,10 @@ const LoginForm = () => {
       setError('Veuillez remplir tous les champs');
       return;
     }
-    // Here you would typically make an API call to verify credentials
+    // Here you would make an API call to verify credentials
     console.log('Login attempt:', credentials);
     // For now, just navigate to the next page
-    navigate('/dashboard'); // or wherever you want to redirect after login
+    navigate('/home'); // or wherever you want to redirect after login
   };
 
   const togglePasswordVisibility = () => {

@@ -12,11 +12,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
+
       {/* Left side with image */}
       <div className="w-full md:w-1/2 bg-cover bg-center overflow-hidden relative p-3 md:p-5 h-[30vh] md:h-auto" >
-        <img 
-          src={education} 
-          alt="" 
+        <img
+          src={education}
+          alt=""
           className='w-full h-full object-cover rounded-3xl'
         />
         <div className="absolute bottom-5 md:bottom-10 left-5 md:left-10 text-white">
@@ -40,11 +41,12 @@ export default function Login() {
             </button>
           </div>
         </div>
-        
+
         <div className="w-full max-w-md pt-3 md:pt-5">
           <p className="text-gray-500 text-xs md:text-sm mb-4 md:mb-6 pb-3 md:pb-5">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
+
           <LoginForm />
         </div>
       </div>
