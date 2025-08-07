@@ -52,32 +52,29 @@ export default function LandingPage() {
         <NavBar />
       </div>
       <Header />
-      <div> 
-      </div>
-     
       <Features />
-      <div className="flex justify-end pr-20 ">
+      <div className="flex justify-end pr-4 md:pr-20">
           <button 
             onClick={HandleExplore}
-            className="text-[#36B3BD] cursor-pointer hover:scale-101 hover:text-teal-600 text-lg  font-medium"
+            className="text-[#36B3BD] cursor-pointer hover:scale-101 hover:text-teal-600 text-base md:text-lg font-medium"
           >
             Explorer les cours &rarr;
           </button>
-        </div>
-      <div className='pl-10 flex '>
-        <img className='h-10' src={sciencelogo} alt="" />
-        <p className='font-bold text-2xl'>Cours 1 ére année</p>
+      </div>
+      <div className='px-4 md:pl-10 flex items-center mb-4'>
+        <img className='h-8 md:h-10' src={sciencelogo} alt="" />
+        <p className='font-bold text-xl md:text-2xl ml-2'>Cours 1 ére année</p>
       </div>
      <ExploreCourses courses={row1} />
     
-       <div className='pl-10 flex '>
-        <img className='h-10' src={mathlogo} alt="" />
-        <p className='font-bold text-2xl'>Cours 2 éme année</p>
+       <div className='px-4 md:pl-10 flex items-center mb-4'>
+        <img className='h-8 md:h-10' src={mathlogo} alt="" />
+        <p className='font-bold text-xl md:text-2xl ml-2'>Cours 2 éme année</p>
       </div>
      <ExploreCourses courses={row2} />
-       <div className='pl-10 flex '>
-        <img className='h-10' src={physicslogo} alt="" />
-        <p className='font-bold text-2xl'>Cours 3 éme année </p>
+       <div className='px-4 md:pl-10 flex items-center mb-4'>
+        <img className='h-8 md:h-10' src={physicslogo} alt="" />
+        <p className='font-bold text-xl md:text-2xl ml-2'>Cours 3 éme année </p>
       </div>
      <ExploreCourses courses={row2} />
       <LatestCourses />

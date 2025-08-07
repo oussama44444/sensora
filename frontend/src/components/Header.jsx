@@ -16,7 +16,7 @@ export default function Header() {
         <div className="flex items-center justify-start min-h-screen px-10">
       <div className="max-w-md">
         <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-          <span className="text-orange-400">Étudier </span>
+          <span className="text-orange-500">Étudier </span>
           en ligne est désormais
 beaucoup<br />
            plus facile

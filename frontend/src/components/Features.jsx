@@ -112,235 +112,246 @@ export default function Features() {
     </div>
   </div>
 </div>
-<section className='py-16 px-6 md:px-20 pt-30 bg-white'>
-  
-  <h2 className="text-3xl font-bold pb-10 text-gray-800">
-        Nos  <span className="text-teal-500">Fonctionnalités.</span></h2>
-        <p className='text-center text-gray-500 mb-16'>Cette fonctionnalité exceptionnelle peut rendre les activités d’apprentissage plus efficaces."</p>
-        <div className="mb-20 flex flex-col md:flex-row items-center gap-20">
-  
-  <div className="md:w-1/2">
-    <img src={call} alt="Feature" className="w-full rounded-xl" />
-    
-  </div>
+   <section className='py-8 px-4 md:py-16 md:px-20 pt-20 md:pt-30 bg-white'>
+      {/* Title Section */}
+      <div className="text-center ">
+        <h2 className="text-2xl md:text-3xl font-bold pb-6 md:pb-10 text-gray-800">
+          Nos <span className="text-teal-500">Fonctionnalités.</span>
+        </h2>
+        <p className='text-gray-500 mb-8 md:mb-16 px-4 md:px-0'>
+          Cette fonctionnalité exceptionnelle peut rendre les activités d'apprentissage plus efficaces.
+        </p>
+      </div>
 
-  
-  <div className="md:w-1/2 pt-20">
-  <div className='pb-20'>
-    <h2 className="text-3xl font-bold text-gray-800 pr-30">
-        Une <span className="text-teal-500">interface utilisateur </span><h2 className="text-3xl font-bold text-gray-800">conçue pour la salle de classe.</h2></h2>
+      {/* Feature 1: Interface Utilisateur */}
+      <div className="mb-12 md:mb-20 flex flex-col md:flex-row items-center gap-8 md:gap-20">
+        <div className="w-full md:w-1/2 order-1 md:order-1">
+          <img src={call} alt="Interface utilisateur" className="w-full h-110 max-w-md mx-auto rounded-xl" />
         </div>
-   <div className="space-y-6">
-      {classfeatures.map((feature, index) => (
-        <div key={index} className="flex items-start gap-4">
-          <div className={`rounded-full p-2 ${feature.bgColor}`}>
-            {feature.icon}
+        <div className="w-full md:w-1/2 pt-8 md:pt-20 order-2 md:order-2">
+          <div className='pb-8 md:pb-20 text-center md:text-left '>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Une <span className="text-teal-500">interface utilisateur </span>
+            </h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              conçue pour la salle de classe.
+            </h2>
           </div>
-          <p className="text-gray-700  leading-relaxed max-w-md pr-10 pb-10">{feature.text}</p>
+          <div className="space-y-6 md:pr-30">
+            {classfeatures.map((feature, index) => (
+              <div key={index} className="flex items-start gap-4 mx-auto max-w-md">
+                <div className={`rounded-full p-2 ${feature.bgColor}`}>
+                  {feature.icon}
+                </div>
+                <p className="text-gray-700 text-center md:text-left leading-relaxed">{feature.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-      
-    </div>
-  </div>
-</div>
-        <div className="mb-20 flex flex-col md:flex-row-reverse items-center gap-1">
-  
- <div className="md:w-1/2 relative">
-  {/* Image */}
-  <img
-    src={featimg}
-    alt="Feature"
-    className="w-[500px] h-[675px] pr-[50px] rounded-xl pb-20 relative z-10"
-  />
+      </div>
 
-  {/* Floating Bubbles */}
-  <span className="absolute w-4 h-4 bg-blue-400 rounded-full top-50 left-1/2 animate-float delay-0"></span>
-  <span className="absolute w-4 h-4 bg-green-700 rounded-full top-20 left-1/2 animate-float delay-0"></span>
-  <span className="absolute w-3 h-3 bg-pink-400 rounded-full top-1/3 right-50 animate-float delay-200"></span>
-  <span className="absolute w-5 h-5 bg-purple-400 rounded-full bottom-5 left-1/4 animate-float delay-400"></span>
-  <span className="absolute w-2 h-2 bg-green-300 rounded-full bottom-1/4 right-1/3 animate-float delay-600"></span>
-  <span className="absolute w-3 h-3 bg-yellow-400 rounded-full top-50 left-20 animate-float delay-300"></span>
-  <span className="absolute w-4 h-4 bg-red-800 rounded-full bottom-5 right-50 animate-float delay-100"></span>
-  
-  <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 right-40 animate-float delay-100"></span>
-  <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
-  <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 left-40 animate-float delay-100"></span>
-  <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 left-[30%] animate-float delay-500"></span>
-  
-  <span className="absolute w-3.5 h-3.5 bg-teal-400 rounded-full bottom-[10%] left-[10%] animate-float delay-700"></span>
-  <span className="absolute w-3 h-3 bg-red-400 rounded-full top-40 left-40 animate-float delay-300"></span>
-  <span className="absolute w-2 h-2 bg-orange-300 rounded-full top-[50%] right-[10%] animate-float delay-[800ms]"></span>
-   <FaReact className="absolute w-5 h-5 top-[-10px] left-[50%] animate-float delay-0 text-blue-500" />
-  <FaNodeJs className="absolute w-6 h-6 top-[20%] right-[-10px] animate-float delay-200 text-green-600" />
-  <FaPython className="absolute w-5 h-5 bottom-[-10px] left-[25%] animate-float delay-400 text-yellow-500" />
-   <FaUserGraduate className="absolute w-6 h-6 top-[-10px] left-[50%] animate-float delay-0 text-blue-500" />
-      <FaChalkboardTeacher className="absolute w-5 h-5 top-[20%] right-[-10px] animate-float delay-200 text-green-600" />
-      <FaBookOpen className="absolute w-7 h-7 bottom-[-10px] left-[25%] animate-float delay-400 text-purple-600" />
-      <FaUsers className="absolute w-4 h-4 bottom-[25%] right-[-10px] animate-float delay-600 text-pink-500" />
-      <FaUserGraduate className="absolute w-5 h-5 top-[10px] left-[10px] animate-float delay-300 text-yellow-500" />
-      <FaChalkboardTeacher className="absolute w-4 h-4 bottom-[10px] right-[10px] animate-float delay-100 text-red-400" />
-      <FaBookOpen className="absolute w-5 h-5 top-[40px] right-[90px] animate-float delay-500 text-indigo-500" />
-      <FaUsers className="absolute w-6 h-6 bottom-[40px] left-[40px] animate-float delay-700 text-teal-400" />
-      <FaUserGraduate className="absolute w-4 h-4 top-[50%] right-[20px] animate-float delay-[800ms] text-orange-400" />
-</div>
-
-
-  
-  <div className="md:w-1/2 pt-20">
-  <div className='pb-20 '>
-    <h2 className="text-3xl font-bold text-justify break-words text-gray-800 pl-40">
-         <span className="text-teal-500">Outils  pour </span><h2 className="text-3xl font-bold text-gray-800">enseignants et apprenants.</h2></h2>
+      {/* Feature 2: Outils pour enseignants */}
+      <div className="mb-12 md:mb-20 flex flex-col md:flex-row-reverse items-center gap-8 md:gap-1">
+        <div className="w-full md:w-1/2 relative order-1 md:order-1">
+          <img
+            src={featimg}
+            alt="Outils pour enseignants"
+            className="w-full max-w-md mx-auto h-auto md:w-[500px] md:h-[675px] md:pr-[50px] rounded-xl pb-4 md:pb-20 relative z-10"
+          />
+          
+          {/* Floating Bubbles - Visible on all screens but positioned differently */}
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-400 rounded-full top-1/2 md:top-50 left-1/2 animate-float delay-0"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-green-700 rounded-full top-1/4 md:top-20 left-1/2 animate-float delay-0"></span>
+          <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-pink-400 rounded-full top-1/3 md:top-1/3 right-1/4 md:right-50 animate-float delay-200"></span>
+          <span className="absolute w-4 h-4 md:w-5 md:h-5 bg-purple-400 rounded-full bottom-1/6 md:bottom-5 left-1/4 animate-float delay-400"></span>
+          <span className="absolute w-2 h-2 md:w-2 md:h-2 bg-green-300 rounded-full bottom-1/3 md:bottom-1/4 right-1/3 animate-float delay-600"></span>
+          <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full top-1/2 md:top-50 left-1/5 md:left-20 animate-float delay-300"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-800 rounded-full bottom-1/6 md:bottom-5 right-1/3 md:right-50 animate-float delay-100"></span>
+          
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 right-1/3 md:right-40 animate-float delay-100"></span>
+          <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 left-1/3 md:left-40 animate-float delay-100"></span>
+          <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 left-1/4 md:left-[30%] animate-float delay-500"></span>
+          
+          <span className="absolute w-3 h-3 md:w-3.5 md:h-3.5 bg-teal-400 rounded-full bottom-1/6 md:bottom-[10%] left-1/6 md:left-[10%] animate-float delay-700"></span>
+          <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-red-400 rounded-full top-1/2 md:top-40 left-1/3 md:left-40 animate-float delay-300"></span>
+          <span className="absolute w-2 h-2 md:w-2 md:h-2 bg-orange-300 rounded-full top-1/2 md:top-[50%] right-1/6 md:right-[10%] animate-float delay-[800ms]"></span>
+          
+          {/* Icons - Visible on all screens */}
+          <FaUserGraduate className="absolute w-5 h-5 md:w-6 md:h-6 top-0 md:top-[-10px] left-1/2 md:left-[50%] animate-float delay-0 text-blue-500" />
+          <FaChalkboardTeacher className="absolute w-4 h-4 md:w-5 md:h-5 top-1/5 md:top-[20%] right-0 md:right-[-10px] animate-float delay-200 text-green-600" />
+          <FaBookOpen className="absolute w-5 h-5 md:w-7 md:h-7 bottom-0 md:bottom-[-10px] left-1/4 md:left-[25%] animate-float delay-400 text-purple-600" />
+          <FaUsers className="absolute w-3 h-3 md:w-4 md:h-4 bottom-1/4 md:bottom-[25%] right-0 md:right-[-10px] animate-float delay-600 text-pink-500" />
+          <FaUserGraduate className="absolute w-4 h-4 md:w-5 md:h-5 top-1/6 md:top-[10px] left-1/6 md:left-[10px] animate-float delay-300 text-yellow-500" />
+          <FaChalkboardTeacher className="absolute w-3 h-3 md:w-4 md:h-4 bottom-1/6 md:bottom-[10px] right-1/6 md:right-[10px] animate-float delay-100 text-red-400" />
+          <FaBookOpen className="absolute w-4 h-4 md:w-5 md:h-5 top-1/4 md:top-[40px] right-1/4 md:right-[90px] animate-float delay-500 text-indigo-500" />
+          <FaUsers className="absolute w-5 h-5 md:w-6 md:h-6 bottom-1/3 md:bottom-[40px] left-1/4 md:left-[40px] animate-float delay-700 text-teal-400" />
+          <FaUserGraduate className="absolute w-3 h-3 md:w-4 md:h-4 top-1/2 md:top-[50%] right-1/6 md:right-[20px] animate-float delay-[800ms] text-orange-400" />
         </div>
-   <div className="space-y-6 pl-40">
-      
-          <p className="text-gray-700 text-justify break-words  leading-relaxed max-w-md pr-10 pb-10">Class dispose d’un ensemble dynamique d’outils pédagogiques conçus pour être utilisés en temps réel pendant les cours. Les enseignants peuvent distribuer des devoirs en direct que les élèves complètent et soumettent immédiatement. </p>
-        
-      
-    </div>
-  </div>
-</div>
 
- <div className="mb-20 flex flex-col md:flex-row items-center gap-20">
-  
-  <div className="md:w-1/2 relative">
-  {/* Image */}
-  <img
-    src={quizz}
-    alt="Feature"
-    className="w-[500px] h-[375px] pr-[50px] rounded-xl pb-2 relative z-10"
-  />
-
-  {/* Floating Bubbles */}
-  <span className="absolute w-4 h-4 bg-blue-400 rounded-full top-50 left-1/2 animate-float delay-0"></span>
-  <span className="absolute w-4 h-4 bg-green-700 rounded-full top-20 left-1/2 animate-float delay-0"></span>
-  <span className="absolute w-3 h-3 bg-pink-400 rounded-full top-1/3 right-20 animate-float delay-200"></span>
-  <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 right-10 animate-float delay-100"></span>
-  <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
-  <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 left-40 animate-float delay-100"></span>
-  </div>
-
-  
-  <div className="md:w-1/2 pt-20 ">
-  <div className='pb-20 '>
-    <h2 className="text-3xl font-bold text-gray-800 pr-30">
-        Évaluations, <span className="text-teal-500"> Quiz </span><h2 className="text-3xl font-bold text-gray-800">, Tests.</h2></h2>
+        <div className="w-full md:w-1/2 pt-8 md:pt-20 order-2 md:order-2">
+          <div className='pb-8 md:pb-20 text-center md:text-left md:pl-40'>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              <span className="text-teal-500">Outils pour </span>
+            </h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              enseignants et apprenants.
+            </h2>
+          </div>
+          <div className="space-y-6 px-4 md:pl-40 md:pr-0">
+            <p className="text-gray-700 text-center md:text-justify leading-relaxed max-w-md mx-auto md:mx-0">
+              Class dispose d'un ensemble dynamique d'outils pédagogiques conçus pour être utilisés en temps réel pendant les cours. Les enseignants peuvent distribuer des devoirs en direct que les élèves complètent et soumettent immédiatement.
+            </p>
+          </div>
         </div>
-   <div className="space-y-6">
-      
-          <p className="text-gray-700 text-justify break-words  leading-relaxed max-w-md pr-10 pb-20">Lancez facilement des devoirs, quiz et tests en direct.
-Les résultats des étudiants sont automatiquement enregistrés dans le carnet de notes en ligne.</p>
-      
-      
-    </div>
-  </div>
-  
-</div>
-{!showAll && (
-        <div className="text-center  mb-10 pt-10">
+      </div>
+
+      {/* Feature 3: Évaluations */}
+      <div className="mb-12 md:mb-20 flex flex-col md:flex-row items-center gap-8 md:gap-20">
+        <div className="w-full md:w-1/2 relative order-1 md:order-1">
+          <img
+            src={quizz}
+            alt="Évaluations"
+            className="w-full max-w-md mx-auto h-auto md:w-[500px] md:h-[375px] md:pr-[50px] rounded-xl pb-4 md:pb-2 relative z-10"
+          />
+          {/* Floating Bubbles */}
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-400 rounded-full top-1/2 md:top-50 left-1/2 animate-float delay-0"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-green-700 rounded-full top-1/4 md:top-20 left-1/2 animate-float delay-0"></span>
+          <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-pink-400 rounded-full top-1/3 md:top-1/3 right-1/5 md:right-20 animate-float delay-200"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 right-1/6 md:right-10 animate-float delay-100"></span>
+          <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
+          <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 left-1/3 md:left-40 animate-float delay-100"></span>
+          
+          {/* Icons */}
+          <FaReact className="absolute w-4 h-4 md:w-5 md:h-5 top-0 md:top-[-10px] left-1/2 md:left-[50%] animate-float delay-0 text-blue-500" />
+          <FaNodeJs className="absolute w-5 h-5 md:w-6 md:h-6 top-1/5 md:top-[20%] right-0 md:right-[-10px] animate-float delay-200 text-green-600" />
+          <FaPython className="absolute w-4 h-4 md:w-5 md:h-5 bottom-0 md:bottom-[-10px] left-1/4 md:left-[25%] animate-float delay-400 text-yellow-500" />
+        </div>
+
+        <div className="w-full md:w-1/2 pt-8 md:pt-20 order-2 md:order-2">
+          <div className='pb-8 md:pb-20 text-center md:text-left'>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Évaluations, <span className="text-teal-500"> Quiz </span>
+            </h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Tests.
+            </h2>
+          </div>
+          <div className="space-y-6 px-4 md:px-0">
+            <p className="text-gray-700 text-center md:text-justify leading-relaxed max-w-md mx-auto md:mx-0">
+              Lancez facilement des devoirs, quiz et tests en direct.
+              Les résultats des étudiants sont automatiquement enregistrés dans le carnet de notes en ligne.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Conditional Features */}
+      {!showAll ? (
+        <div className="text-center mb-10 pt-10">
           <button
             onClick={() => setShowAll(true)}
-            className="text-teal-600 border border-teal-300 rounded-3xl h-10 w-50 hover:bg-teal-100 cursor-pointer font-semibold hover:underline"
+            className="text-teal-600 border border-teal-300 rounded-3xl px-6 py-2 hover:bg-teal-100 cursor-pointer font-semibold hover:underline"
           >
             Explore More
           </button>
         </div>
-      )}
-
-      {showAll && (
+      ) : (
         <>
-          <div className="mb-20 flex flex-col md:flex-row-reverse items-center gap-20">
-            <div className="md:w-1/2 relative">
+          {/* Feature 4: Discussions */}
+          <div className="mb-12 md:mb-20 flex flex-col md:flex-row-reverse items-center gap-8 md:gap-20">
+            <div className="w-full md:w-1/2 relative order-1 md:order-1">
               <img
                 src={meet}
-                alt="Feature"
-                className="w-[500px] h-[375px] pr-[50px] rounded-xl pb-2 relative z-10"
+                alt="Discussions"
+                className="w-full max-w-md mx-auto h-auto md:w-[500px] md:h-[375px] md:pr-[50px] rounded-xl pb-4 md:pb-2 relative z-10"
               />
               {/* Floating Bubbles */}
-              <span className="absolute w-4 h-4 bg-blue-400 rounded-full top-50 left-1/2 animate-float delay-0"></span>
-              <span className="absolute w-4 h-4 bg-green-700 rounded-full top-1 left-1/2 animate-float delay-0"></span>
-              <span className="absolute w-3 h-3 bg-pink-400 rounded-full top-1/3 right-20 animate-float delay-200"></span>
-              <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 right-10 animate-float delay-100"></span>
-              <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
-              <span className="absolute w-4 h-4 bg-blue-300 rounded-full top-10 left-10 animate-float delay-100"></span>
-              <span className="absolute w-4 h-4 bg-red-500 rounded-full top-70 left-1 animate-float delay-100"></span>
-              <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
-              <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-10 left-10 animate-float delay-100"></span>
-            </div>
-
-            <div className="md:w-1/2 pt-20">
-              <div className="pb-20 text-justify break-words">
-                <h2 className="text-3xl font-bold text-gray-800 pr-30">
-                  Discussions <span className="text-teal-500"> en tête-à-tête </span>.
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-400 rounded-full top-1/2 md:top-50 left-1/2 animate-float delay-0"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-green-700 rounded-full top-1/12 md:top-1 left-1/2 animate-float delay-0"></span>
+              <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-pink-400 rounded-full top-1/3 md:top-1/3 right-1/5 md:right-20 animate-float delay-200"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 right-1/6 md:right-10 animate-float delay-100"></span>
+              <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-300 rounded-full top-1/6 md:top-10 left-1/6 md:left-10 animate-float delay-100"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full top-2/3 md:top-70 left-1/12 md:left-1 animate-float delay-100"></span>
+              <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-1/6 md:bottom-10 left-1/6 md:left-10 animate-float delay-100"></span>
+            </div>   <div className="w-full md:w-1/2 pt-8 md:pt-20 order-2 md:order-2">
+              <div className="pb-8 md:pb-20 text-center md:text-left md:pl-40">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+                  Discussions <span className="text-teal-500">en tête-à-tête</span>.
                 </h2>
               </div>
-              <div className="space-y-6">
-                <p className="text-gray-700 text-justify break-words leading-relaxed max-w-md pr-10 pb-20">
-                  Les enseignants et les assistants pédagogiques peuvent discuter en privé avec les étudiants sans quitter l’environnement Zoom.
+              <div className="space-y-6 px-4  md:px-0">
+                <p className="text-gray-700 md:pl-40 text-center md:text-justify leading-relaxed max-w-md mx-auto md:mx-0">
+                  Les enseignants et les assistants pédagogiques peuvent discuter en privé avec les étudiants sans quitter l'environnement Zoom.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mb-20 flex flex-col md:flex-row items-center gap-20">
-            <div className="md:w-1/2 relative">
+          {/* Feature 5: Niveaux d'éducation */}
+          <div className="mb-12 md:mb-20 flex flex-col md:flex-row items-center gap-8 md:gap-20">
+            <div className="w-full md:w-1/2 relative order-1 md:order-1">
               <img
                 src={level}
-                alt="Feature"
-                className="w-[500px] h-[375px] pr-[50px] rounded-xl pb-2 relative z-10"
+                alt="Niveaux d'éducation"
+                className="w-full max-w-md mx-auto h-auto md:w-[500px] md:h-[375px] md:pr-[50px] rounded-xl pb-4 md:pb-2 relative z-10"
               />
-              {/* Floating Bubbles + Icons */}
-              <span className="absolute w-4 h-4 bg-blue-400 rounded-full top-50 left-1/2 animate-float delay-0"></span>
-              <span className="absolute w-4 h-4 bg-green-700 rounded-full top-1 left-1/2 animate-float delay-0"></span>
-              <span className="absolute w-3 h-3 bg-pink-400 rounded-full top-1/3 right-20 animate-float delay-200"></span>
-              <span className="absolute w-4 h-4 bg-red-300 rounded-full bottom-70 right-10 animate-float delay-100"></span>
-              <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
-              <span className="absolute w-4 h-4 bg-blue-300 rounded-full top-10 left-10 animate-float delay-100"></span>
-              <span className="absolute w-4 h-4 bg-red-500 rounded-full top-70 left-1 animate-float delay-100"></span>
-              <span className="absolute w-2.5 h-2.5 bg-indigo-300 rounded-full top-10 right-[30%] animate-float delay-500"></span>
+              
+              {/* Floating Bubbles */}
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-400 rounded-full top-1/2 md:top-50 left-1/2 animate-float delay-0"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-green-700 rounded-full top-1/12 md:top-1 left-1/2 animate-float delay-0"></span>
+              <span className="absolute w-2 h-2 md:w-3 md:h-3 bg-pink-400 rounded-full top-1/3 md:top-1/3 right-1/5 md:right-20 animate-float delay-200"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-300 rounded-full bottom-2/3 md:bottom-70 right-1/6 md:right-10 animate-float delay-100"></span>
+              <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-blue-300 rounded-full top-1/6 md:top-10 left-1/6 md:left-10 animate-float delay-100"></span>
+              <span className="absolute w-3 h-3 md:w-4 md:h-4 bg-red-500 rounded-full top-2/3 md:top-70 left-1/12 md:left-1 animate-float delay-100"></span>
+              <span className="absolute w-2 h-2 md:w-2.5 md:h-2.5 bg-indigo-300 rounded-full top-1/6 md:top-10 right-1/4 md:right-[30%] animate-float delay-500"></span>
 
-              <FaChalkboardTeacher className="absolute w-5 h-5 top-[20%] right-[-10px] animate-float delay-200 text-green-600" />
-              <FaBookOpen className="absolute w-7 h-7 bottom-[-10px] left-[25%] animate-float delay-400 text-red-600" />
-              <FaUsers className="absolute w-4 h-4 bottom-[25%] right-[150px] animate-float delay-600 text-pink-500" />
-              <FaUserGraduate className="absolute w-5 h-5 top-[80px] left-[150px] animate-float delay-300 text-yellow-500" />
-              <FaChalkboardTeacher className="absolute w-4 h-4 bottom-[80px] right-[80px] animate-float delay-100 text-red-400" />
-              <FaBookOpen className="absolute w-5 h-5 top-[40px] right-[90px] animate-float delay-500 text-indigo-500" />
-              <FaUsers className="absolute w-6 h-6 bottom-[70px] left-[80px] animate-float delay-700 text-teal-400" />
-              <FaUserGraduate className="absolute w-4 h-4 top-[50%] right-[175px] animate-float delay-[800ms] text-orange-400" />
-              <FaChalkboardTeacher className="absolute w-5 h-5 top-[20%] right-[-10px] animate-float delay-200 text-green-600" />
-              <FaBookOpen className="absolute w-7 h-7 bottom-[-10px] left-[25%] animate-float delay-400 text-purple-600" />
-              <FaUsers className="absolute w-4 h-4 bottom-[25%] left-[21px] animate-float delay-600 text-pink-500" />
-              <FaBookOpen className="absolute w-5 h-5 bottom-[5px] left-[90px] animate-float delay-500 text-indigo-500" />
-              <FaUsers className="absolute w-6 h-6 bottom-[10px] right-[200px] animate-float delay-700 text-teal-400" />
+              {/* Icons */}
+              <FaChalkboardTeacher className="absolute w-4 h-4 md:w-5 md:h-5 top-1/5 md:top-[20%] right-0 md:right-[-10px] animate-float delay-200 text-green-600" />
+              <FaBookOpen className="absolute w-5 h-5 md:w-7 md:h-7 bottom-0 md:bottom-[-10px] left-1/4 md:left-[25%] animate-float delay-400 text-red-600" />
+              <FaUsers className="absolute w-3 h-3 md:w-4 md:h-4 bottom-1/4 md:bottom-[25%] right-1/4 md:right-[150px] animate-float delay-600 text-pink-500" />
+              <FaUserGraduate className="absolute w-4 h-4 md:w-5 md:h-5 top-1/3 md:top-[80px] left-1/4 md:left-[150px] animate-float delay-300 text-yellow-500" />
+              <FaChalkboardTeacher className="absolute w-3 h-3 md:w-4 md:h-4 bottom-1/3 md:bottom-[80px] right-1/6 md:right-[80px] animate-float delay-100 text-red-400" />
+              <FaBookOpen className="absolute w-4 h-4 md:w-5 md:h-5 top-1/4 md:top-[40px] right-1/4 md:right-[90px] animate-float delay-500 text-indigo-500" />
+              <FaUsers className="absolute w-5 h-5 md:w-6 md:h-6 bottom-1/3 md:bottom-[70px] left-1/6 md:left-[80px] animate-float delay-700 text-teal-400" />
+              <FaUserGraduate className="absolute w-3 h-3 md:w-4 md:h-4 top-1/2 md:top-[50%] right-1/4 md:right-[175px] animate-float delay-[800ms] text-orange-400" />
+              <FaChalkboardTeacher className="absolute w-4 h-4 md:w-5 md:h-5 top-1/5 md:top-[20%] right-0 md:right-[-10px] animate-float delay-200 text-green-600" />
+              <FaBookOpen className="absolute w-5 h-5 md:w-7 md:h-7 bottom-0 md:bottom-[-10px] left-1/4 md:left-[25%] animate-float delay-400 text-purple-600" />
+              <FaUsers className="absolute w-3 h-3 md:w-4 md:h-4 bottom-1/4 md:bottom-[25%] left-1/12 md:left-[21px] animate-float delay-600 text-pink-500" />
+              <FaBookOpen className="absolute w-4 h-4 md:w-5 md:h-5 bottom-1/12 md:bottom-[5px] left-1/4 md:left-[90px] animate-float delay-500 text-indigo-500" />
+              <FaUsers className="absolute w-5 h-5 md:w-6 md:h-6 bottom-1/12 md:bottom-[10px] right-1/4 md:right-[200px] animate-float delay-700 text-teal-400" />
             </div>
 
-            <div className="md:w-1/2 pt-20">
-              <div className="pb-20">
-                <h2 className="text-3xl font-bold text-gray-800 pr-40">
+            <div className="w-full md:w-1/2 pt-8 md:pt-20 order-2 md:order-2">
+              <div className="pb-8 md:pb-20 text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
                   Cours pour chaque <span className="text-teal-500">niveau d'éducation</span>.
                 </h2>
               </div>
-              <div className="space-y-6">
-                <p className="text-gray-700 text-justify break-words leading-relaxed max-w-md pr-10 pb-20">
+              <div className="space-y-6 px-4 md:px-0">
+                <p className="text-gray-700 text-center md:text-justify leading-relaxed max-w-md mx-auto md:mx-0">
                   Accédez à une large sélection de cours adaptés à tous les niveaux d'éducation, du fondamental au supérieur. Que vous soyez élève, étudiant ou en reconversion, trouvez les ressources qui répondent à vos besoins.
                 </p>
               </div>
             </div>
           </div>
-          <div className="text-center mt-6">
-  <button
-    onClick={() => setShowAll(false)}
-    className="text-teal-600 border border-teal-300 rounded-3xl h-10 w-50 hover:bg-teal-100 cursor-pointer font-semibold hover:underline"
-  >
-    Show Less
-  </button>
-</div>
-        </>
-        
-      )}
-   
 
-</section>
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setShowAll(false)}
+              className="text-teal-600 border border-teal-300 rounded-3xl px-6 py-2 hover:bg-teal-100 cursor-pointer font-semibold hover:underline"
+            >
+              Show Less
+            </button>
+          </div>
+        </>
+      )}
+    </section>
 
     </div>
   );
 }
+   
