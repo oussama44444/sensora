@@ -14,6 +14,7 @@ export default function StoryForm({ story = null, onSubmit, onCancel }) {
             audio: { fr: '', tn: '' },
             question: {
               question: { fr: '', tn: '' },
+              questionAudio: { fr: '', tn: '' }, // NEW
               answers: [
                 { text: { fr: '', tn: '' }, correct: true },
                 { text: { fr: '', tn: '' }, correct: false },
@@ -154,6 +155,7 @@ export default function StoryForm({ story = null, onSubmit, onCancel }) {
             audio: segment.audio,
             question: {
               question: segment.question.question,
+              questionAudio: segment.question.questionAudio || { fr: '', tn: '' }, // NEW: include questionAudio
               answers: segment.question.answers.map((answer, answerIndex) => ({
                 text: answer.text,
                 correct: answer.correct !== undefined ? answer.correct : (answerIndex === 0)
@@ -253,6 +255,7 @@ export default function StoryForm({ story = null, onSubmit, onCancel }) {
               audio: { fr: '', tn: '' },
               question: {
                 question: { fr: '', tn: '' },
+                questionAudio: { fr: '', tn: '' }, // NEW
                 answers: [
                   { text: { fr: '', tn: '' }, correct: true },
                   { text: { fr: '', tn: '' }, correct: false },
@@ -284,6 +287,7 @@ export default function StoryForm({ story = null, onSubmit, onCancel }) {
       audio: { fr: '', tn: '' },
       question: {
         question: { fr: '', tn: '' },
+        questionAudio: { fr: '', tn: '' }, // NEW
         answers: [
           { text: { fr: '', tn: '' }, correct: true },
           { text: { fr: '', tn: '' }, correct: false },
@@ -475,6 +479,21 @@ export default function StoryForm({ story = null, onSubmit, onCancel }) {
                   {isLanguageActive(currentLanguage) && !segment.question.question[currentLanguage] && (
                     <p className="text-red-500 text-xs sm:text-sm mt-1">⚠️ Question is required for {currentLanguage === 'fr' ? 'French' : 'Tunisian'} version</p>
                   )}
+                </div>
+
+                {/* NEW: Question Audio Upload */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question Audio {currentLanguage === 'fr' ? '(French)' : '(Tunisian)'} (Optional)
+                    <span className="text-xs text-gray-500 ml-2">- Allows user to replay the question</span>
+                  </label>
+                  <AudioUploader
+                    existingAudio={segment.question.questionAudio?.[currentLanguage]}
+                    onAudioUploaded={(url) => updateField(`stages.${stageIndex}.segments.${segmentIndex}.question.questionAudio`, url, currentLanguage)}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 Upload an audio file that reads the question aloud. Users can replay it during the quiz.
+                  </p>
                 </div>
 
                 {/* Hint */}

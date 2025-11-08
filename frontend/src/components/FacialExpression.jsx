@@ -46,7 +46,7 @@ const FullscreenFace = ({ blinkInterval = 4500, pupilMoveInterval = 1200, isVisi
   `;
 
   return (
-    <div className={`fixed inset-0 flex justify-center items-center bg-[#7bb3e0] transition-opacity duration-500 
+    <div className={`fixed inset-0 flex justify-center items-center bg-[#dededc] transition-opacity duration-500 
       ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
       <style>{svgStyles}</style>
 
@@ -136,7 +136,7 @@ const FullscreenFace = ({ blinkInterval = 4500, pupilMoveInterval = 1200, isVisi
 
           {/* Eyelid */}
           <rect
-            x="206"
+            x="212"
             y="-11"
             width="95"
             height="120"
@@ -156,50 +156,65 @@ const FullscreenFace = ({ blinkInterval = 4500, pupilMoveInterval = 1200, isVisi
         <circle cx="0" cy="228" r="28" fill="#ffb59b" />
         <circle cx="320" cy="228" r="28" fill="#ffb59b" />
 
-        {/* Croissant / crescent mouth (animated) */}
-       <svg
-      width="200"
-      height="120"
-      viewBox="0 0 200 120"
-      xmlns="http://www.w3.org/2000/svg"
-      className="mouth translate-y-45 translate-x-15"
-    >
-      {/* Outer dark croissant mouth */}
-      <path
-       d="M40 55
-           Q100 100 160 55
-           Q100 150 40 55 Z"
-        fill="#263238"
-      />
+        {/* Replace animated SVG mouth with static image */}
+        <image
+          href="/assets/images/mouth.jpg"
+          x="60"
+          y="200"
+          width="200"
+          height="100"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        />
 
-      {/* White teeth area */}
-      <path
-        d="M40 55
-           Q100 100 160 55
-           Q100 70 40 55 Z"
-        fill="#ffffff"
-      />
+        {/*
+        Previous animated SVG mouth (kept as comment for easy restore):
 
-      {/* Tongue (bottom orange part) */}
-      <path
-    d="M60 70
-       Q100 110 140 70
-       Q100 60 60 70 Z"
-    fill="#ff8b56"
-     transform="translate(0, 12)" 
-  />
-      <style>{`
-       
-        @keyframes talk {
-          0%, 100% {
-            transform: scaleY(1);
-          }
-          50% {
-            transform: scaleY(0.6);
-          }
-        }
-      `}</style>
-    </svg>
+        <svg
+          width="200"
+          height="120"
+          viewBox="0 0 200 120"
+          xmlns="http://www.w3.org/2000/svg"
+          className="mouth translate-y-45 translate-x-15"
+        >
+          {/* Outer dark croissant mouth */
+          /* <path
+            d="M40 55
+                Q100 100 160 55
+                Q100 150 40 55 Z"
+            fill="#263238"
+          />
+
+          {/* White teeth area */
+          /* <path
+            d="M40 55
+                Q100 100 160 55
+                Q100 70 40 55 Z"
+            fill="#ffffff"
+          />
+
+          {/* Tongue (bottom orange part) */
+          /* <path
+            d="M60 70
+               Q100 110 140 70
+               Q100 60 60 70 Z"
+            fill="#ff8b56"
+            transform="translate(0, 12)"
+          />
+          <style>{`
+            @keyframes talk {
+              0%, 100% {
+                transform: scaleY(1);
+              }
+              50% {
+                transform: scaleY(0.6);
+              }
+            }
+          `}</style>
+        </svg>
+
+        End of previous mouth SVG
+        */}
       </svg>
     </div>
   );

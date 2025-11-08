@@ -102,13 +102,13 @@ export default function StorySelection() {
             <p className="text-lg sm:text-xl text-gray-600 mb-3 sm:mb-4">
               {language === 'fr' 
                 ? `Aucune histoire disponible en ${languageNames[language]}`
-                : `ماكاش حكايات متوفرة بال${languageNames[language]}`
+                : `ما فماش حكايات متوفرة بال${languageNames[language]}`
               }
             </p>
             <p className="text-gray-500 text-sm sm:text-base">
               {language === 'fr' 
                 ? 'Essayez de changer de langue ou revenez plus tard !'
-                : 'جرب تبدّل اللغة أو عاود تّعاود بعد!'
+                : 'جرب تبدّل اللغة أو عاود بعد'
               }
             </p>
           </div>

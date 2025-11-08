@@ -1,21 +1,22 @@
 const tunisianTranslations = {
   welcome: {
-    title: "Marḥba bīk fī Waqt el Ḥkāya 🌈",
-    startButton: "Bda"
+    title: "مرحبا بيك في وقت الحكاية 🌈",
+    startButton:" إبدأ "
   },
   stories: {
-    title: "Iḫtār Ḥkāya 📖",
-    loading: "El Ḥkāyāt titḥammil...",
-    error: "El Ḥkāyāt ma ḥamlitš"
+    title: "اختر قصة 📖",
+    loading: "...جاري تحميل القصة",
+    error: " القصة لم تُحمَّل "
   },
   questions: {
-    correct: "🎉 Ṣaḥīḥ! Brāvō!",
-    incorrect: "❌ Jāwib marra oḫrā!",
-    next: "Bāʿd"
+    correct: "🎉 صحيح! أحسنت! ",
+    incorrect: "❌ حاول مرة أخرى ",
+    next: "التالي "
   },
   common: {
-    loading: "Yitḥammil...",
-    error: "Problème fi ittiṣāl b serveur"
+    loading: " ....جاري التحميل",
+    error: " خطأ في الاتصال بالخادم ",
+    changeLanguage: "غيّر اللغة — {lang}"
   }
 };
 

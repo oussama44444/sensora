@@ -18,6 +18,11 @@ const storySchema = new mongoose.Schema({
           fr: { type: String, required: false, default: "Question" }, // Remove required
           tn: { type: String, required: false, default: "" }
         },
+        // NEW: Optional question audio per language
+        questionAudio: {
+          fr: { type: String, required: false, default: "" },
+          tn: { type: String, required: false, default: "" }
+        },
         answers: [{
           text: {
             fr: { type: String, required: false, default: "Réponse" }, // Remove required

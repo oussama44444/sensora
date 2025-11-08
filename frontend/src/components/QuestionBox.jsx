@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLanguage } from "../context/LanguageContext";
 import { frenchTranslations, tunisianTranslations } from "../locales";
 
@@ -11,8 +11,9 @@ export default function QuestionBox({ question, onNext, disabled = false, canRet
   const [feedback, setFeedback] = useState("");
   const [disabledAnswers, setDisabledAnswers] = useState([]);
   const [showHint, setShowHint] = useState(false);
+  const [isPlayingQuestionAudio, setIsPlayingQuestionAudio] = useState(false);
+  const audioRef = useRef(null);
   const { language } = useLanguage();
-  
   const t = language === 'fr' ? frenchTranslations : tunisianTranslations;
 
   const colors = [
@@ -21,6 +22,36 @@ export default function QuestionBox({ question, onNext, disabled = false, canRet
     "bg-green-500",
     "bg-yellow-500"
   ];
+
+  const questionAudioUrl = question?.questionAudioUrl || question?.questionAudio || "";
+
+  const playQuestionAgain = async () => {
+    if (!questionAudioUrl) return;
+    try {
+      // stop previous
+      if (audioRef.current) {
+        try { audioRef.current.pause(); } catch {}
+        audioRef.current.src = "";
+      }
+      const audio = new Audio(questionAudioUrl);
+      audioRef.current = audio;
+      audio.onended = () => setIsPlayingQuestionAudio(false);
+      audio.onerror = () => setIsPlayingQuestionAudio(false);
+      setIsPlayingQuestionAudio(true);
+      await audio.play();
+    } catch (e) {
+      setIsPlayingQuestionAudio(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        try { audioRef.current.pause(); } catch {}
+        audioRef.current.src = "";
+      }
+    };
+  }, []);
 
   const handleAnswer = (ans, i) => {
     console.log('Answer clicked:', ans, 'index:', i);
@@ -55,6 +86,18 @@ export default function QuestionBox({ question, onNext, disabled = false, canRet
       <h2 className="bg-purple-200 text-purple-800 font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg text-center w-full text-lg sm:text-xl lg:text-2xl">
         {question.question}
       </h2>
+
+      {/* NEW: Play question again button (only if audio available) */}
+      {questionAudioUrl ? (
+        <button
+          type="button"
+          onClick={playQuestionAgain}
+          disabled={isPlayingQuestionAudio}
+          className={`px-4 py-2 rounded-lg text-white text-sm font-medium ${isPlayingQuestionAudio ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"}`}
+        >
+          {language === 'fr' ? 'Réécouter la question' : 'إعادة سماع السؤال'}
+        </button>
+      ) : null}
 
       {/* Answers */}
       <div className="w-full space-y-3 sm:space-y-4">

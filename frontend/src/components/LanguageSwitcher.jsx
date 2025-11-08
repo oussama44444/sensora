@@ -1,44 +1,30 @@
 import { useLanguage } from '../context/LanguageContext';
 
 export default function LanguageSwitcher() {
-  const { language, switchLanguage } = useLanguage();
+  const { language, t } = useLanguage();
 
-  console.log('🔧 LanguageSwitcher - current language:', language);
+  // Keep only FR and TN labels
+  const labels = { fr: 'Français', tn: 'Tunisien' };
+  const currentLabel = labels[language] || language;
+
+  const changeLabel = () => {
+    // use translation helper if available
+    if (typeof t === 'function') {
+      // expects e.g. "changeLanguage" key in your locales
+      return t('common.changeLanguage')?.replace('{lang}', currentLabel) || `Change language — ${currentLabel}`;
+    }
+    return `Change language — ${currentLabel}`;
+  };
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      <div className="bg-white rounded-full shadow-lg p-1 flex">
-        <button
-          onClick={() => {
-            console.log('🔄 Switching to French (fr)');
-            switchLanguage('fr');
-          }}
-          className={`px-4 py-2 rounded-full transition-all ${
-            language === 'fr' 
-              ? 'bg-blue-500 text-white' 
-              : 'text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          FR
-        </button>
-        <button
-          onClick={() => {
-            console.log('🔄 Switching to Tunisian (tn)');
-            switchLanguage('tn');
-          }}
-          className={`px-4 py-2 rounded-full transition-all ${
-            language === 'tn' 
-              ? 'bg-red-500 text-white' 
-              : 'text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          TN
-        </button>
-      </div>
-      {/* Debug display */}
-      <div className="text-xs text-center mt-1 bg-gray-100 px-2 py-1 rounded">
-        Current: {language}
-      </div>
+      <button
+        onClick={() => window.dispatchEvent(new Event('open-language-selector'))}
+        className="bg-white shadow-md rounded-full px-4 py-2 text-sm font-medium hover:bg-gray-50 flex items-center space-x-2"
+        aria-label="Change language"
+      >
+        <span>{changeLabel()}</span>
+      </button>
     </div>
   );
 }

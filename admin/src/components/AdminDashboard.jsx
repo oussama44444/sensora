@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useStories } from '../../hooks/useStories.jsx';
 import StoryList from '../components/StoryList';
 import StoryForm from '../components/StoryForm';
 import axios from "axios";
 
-const DEFAULT_CORRECT_AUDIO_URL = "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1761869161/audio_succ%C3%A9e_i7dtvv.mp3";
-const DEFAULT_WRONG_AUDIO_URL = "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1761869168/audio_autre_essai_uzag2d.mp3";
-
 export default function AdminDashboard({ initialView = 'list' }) {
   const { id } = useParams(); // For edit route
+  const navigate = useNavigate();
+  const location = useLocation(); // <- new
   const { stories, loading, error, createStory, updateStory, deleteStory, fetchStories } = useStories();
   const [currentView, setCurrentView] = useState(initialView);
   const [selectedStory, setSelectedStory] = useState(null);
+  const [showDetails, setShowDetails] = useState(false); // <-- new
 
   // If we have an ID from URL, load that story for editing
   useEffect(() => {
@@ -25,11 +25,49 @@ export default function AdminDashboard({ initialView = 'list' }) {
     }
   }, [id, stories]);
 
+  // NEW: sync currentView with location pathname so route navigation (Links) updates UI instantly
+  useEffect(() => {
+    const path = location.pathname || '';
+    if (path.endsWith('/create')) {
+      setCurrentView('create');
+      setSelectedStory(null);
+    } else if (path.includes('/edit/')) {
+      // keep selectedStory if already set by id effect; otherwise set view to edit and wait for id effect to populate selectedStory
+      setCurrentView('edit');
+    } else {
+      setCurrentView('list');
+      setSelectedStory(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // Force admin UI to use a dynamic API base (env > current host:5000) and rewrite localhost if found
+  useEffect(() => {
+    const host = window.location.hostname;
+    const protocol = window.location.protocol;
+    const fallbackApi = `${protocol}//${host}:5000`;
+    const apiBase = (import.meta?.env?.VITE_API_URL || fallbackApi).replace(/\/+$/, "");
+    axios.defaults.baseURL = apiBase;
+
+    const origOpen = window.XMLHttpRequest && window.XMLHttpRequest.prototype.open;
+    if (origOpen) {
+      window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
+        try {
+          if (typeof url === "string" && url.startsWith("http://localhost:5000")) {
+            url = url.replace("http://localhost:5000", apiBase);
+          }
+        } catch {}
+        return origOpen.call(this, method, url, async, user, password);
+      };
+    }
+    console.log("📡 Admin API base URL set to:", apiBase);
+  }, []);
+
   // Upload audio to backend and get Cloudinary URL
   const handleAudioUpload = async (file) => {
     const fd = new FormData();
     fd.append("audio", file);
-    const res = await axios.post("http://localhost:5000/stories/upload-audio", fd, {
+    const res = await axios.post(`/stories/upload-audio`, fd, {
       headers: { "Content-Type": "multipart/form-data" }
     });
     return res.data.audioUrl;
@@ -39,7 +77,7 @@ export default function AdminDashboard({ initialView = 'list' }) {
   const handleImageUpload = async (file) => {
     const fd = new FormData();
     fd.append("image", file);
-    const res = await axios.post("http://localhost:5000/stories/upload-image", fd, {
+    const res = await axios.post(`/stories/upload-image`, fd, {
       headers: { "Content-Type": "multipart/form-data" }
     });
     return res.data.imageUrl;
@@ -84,6 +122,28 @@ const handleCreateStory = async (storyData) => {
             return;
           }
         }
+        
+        // NEW: question.questionAudio uploads (optional, per language)
+        if (segment.question?.questionAudio?.fr instanceof File) {
+          try {
+            const audioUrl = await handleAudioUpload(segment.question.questionAudio.fr);
+            segment.question.questionAudio.fr = audioUrl;
+          } catch (error) {
+            console.error('Error uploading French question audio:', error);
+            alert('Error uploading French question audio file');
+            return;
+          }
+        }
+        if (segment.question?.questionAudio?.tn instanceof File) {
+          try {
+            const audioUrl = await handleAudioUpload(segment.question.questionAudio.tn);
+            segment.question.questionAudio.tn = audioUrl;
+          } catch (error) {
+            console.error('Error uploading Tunisian question audio:', error);
+            alert('Error uploading Tunisian question audio file');
+            return;
+          }
+        }
       }
     }
   }
@@ -110,7 +170,7 @@ const handleCreateStory = async (storyData) => {
   }
 
   try {
-    const result = await axios.post("http://localhost:5000/stories", fd, {
+    const result = await axios.post(`/stories`, fd, {
       headers: { 
         "Content-Type": "multipart/form-data"
       },
@@ -172,7 +232,7 @@ const handleCreateStory = async (storyData) => {
 
   try {
     // Use PUT request to the specific story ID
-    const result = await axios.put(`http://localhost:5000/stories/${selectedStory._id}`, fd, {
+    const result = await axios.put(`/stories/${selectedStory._id}`, fd, {
       headers: { 
         "Content-Type": "multipart/form-data"
       },
@@ -215,20 +275,31 @@ const handleCreateStory = async (storyData) => {
   const handleCreateNew = () => {
     setSelectedStory(null);
     setCurrentView('create');
-    // Update URL without page reload
-    window.history.pushState({}, '', '/admin/create');
+    navigate('/admin/create');
   };
 
   const handleEdit = (story) => {
     setSelectedStory(story);
     setCurrentView('edit');
-    window.history.pushState({}, '', `/admin/edit/${story._id}`);
+    navigate(`/admin/edit/${story._id}`);
   };
 
   const handleCancel = () => {
     setCurrentView('list');
     setSelectedStory(null);
-    window.history.pushState({}, '', '/admin');
+    navigate('/admin');
+  };
+
+  // New handler: show story details in a modal
+  const handleViewDetails = (story) => {
+    setSelectedStory(story);
+    setShowDetails(true);
+  };
+
+  const closeDetails = () => {
+    setShowDetails(false);
+    // keep selectedStory if you want, or clear it:
+    // setSelectedStory(null);
   };
 
   if (loading) {
@@ -265,9 +336,7 @@ const handleCreateStory = async (storyData) => {
             stories={stories}
             onEdit={handleEdit}
             onDelete={handleDeleteStory}
-            onView={(story) => {
-              window.open(`/story/${story._id}`, '_blank');
-            }}
+            onView={handleViewDetails}  
           />
         </div>
       )}
@@ -282,7 +351,7 @@ const handleCreateStory = async (storyData) => {
               ← Back to Stories
             </button>
             <h2 className="text-2xl font-bold text-gray-900 mt-2">
-              {currentView === 'create' ? 'Create New Story' : `Edit: ${selectedStory?.title}`}
+              {currentView === 'create' ? 'Create New Story' : `Edit: ${selectedStory?.title?.fr || selectedStory?.title || ''}`}
             </h2>
           </div>
           <StoryForm
@@ -290,6 +359,68 @@ const handleCreateStory = async (storyData) => {
             onSubmit={currentView === 'create' ? handleCreateStory : handleEditStory}
             onCancel={handleCancel}
           />
+        </div>
+      )}
+
+      {/* Story details modal */}
+      {showDetails && selectedStory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black opacity-50" onClick={closeDetails} />
+          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-auto p-6 z-60">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold">Story details</h3>
+              <button onClick={closeDetails} className="text-gray-600 hover:text-gray-900">✕</button>
+            </div>
+
+            <div className="mb-4">
+              <img src={selectedStory.image} alt="story" className="w-full max-h-64 object-cover rounded" />
+            </div>
+
+            <div className="mb-4">
+              <h4 className="font-semibold">Title</h4>
+              <div className="text-sm text-gray-700 break-words">
+                {typeof selectedStory.title === "object" ? (selectedStory.title.fr || selectedStory.title.tn || JSON.stringify(selectedStory.title)) : selectedStory.title}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="font-semibold">Stages</h4>
+              {Array.isArray(selectedStory.stages) && selectedStory.stages.length > 0 ? (
+                selectedStory.stages.map((stage, sIdx) => (
+                  <div key={sIdx} className="mb-3 pl-2 border-l-2 border-gray-200">
+                    <div className="text-sm font-medium text-gray-800">Stage {sIdx + 1}</div>
+                    {Array.isArray(stage.segments) && stage.segments.map((seg, segIdx) => (
+                      <div key={segIdx} className="mt-2 bg-gray-50 p-3 rounded">
+                        <div className="text-sm text-gray-700"><strong>Segment {segIdx + 1}</strong></div>
+                        <div className="text-xs text-gray-600 mt-1">Audio: <a href={typeof seg.audio === 'string' ? seg.audio : (seg.audio?.fr || seg.audio?.tn)} target="_blank" rel="noreferrer" className="text-blue-600 underline">Play</a></div>
+                        {seg.question && (
+                          <div className="mt-2">
+                            <div className="text-sm font-semibold">Question</div>
+                            <div className="text-sm text-gray-700 break-words">{typeof seg.question.question === 'object' ? (seg.question.question.fr || seg.question.question.tn || JSON.stringify(seg.question.question)) : seg.question.question}</div>
+                            <div className="mt-2">
+                              <div className="text-xs font-medium">Answers:</div>
+                              <ul className="list-disc list-inside text-sm text-gray-700">
+                                {(seg.question.answers || []).map((a, ai) => (
+                                  <li key={ai}>{typeof a.text === 'object' ? (a.text.fr || a.text.tn || JSON.stringify(a.text)) : a.text} {a.correct ? <span className="text-green-600 font-semibold"> (correct)</span> : null}</li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">Hint: {typeof seg.question.hint === 'object' ? (seg.question.hint.fr || seg.question.hint.tn || seg.question.hint) : seg.question.hint || "-"}</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-gray-600">No stages available</div>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button onClick={closeDetails} className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Close</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

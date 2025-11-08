@@ -83,28 +83,32 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     console.log("✅ Image uploaded:", imageResult.secure_url);
 
-    // Create the story - FIX: Handle both French-only and Tunisian-only properly
+    // Create the story - include optional questionAudio per language
     const storyData = {
       title: {
-        fr: availableLanguages.includes('fr') ? (title.fr || "Titre français") : "Titre français", // Always provide French fallback
+        fr: availableLanguages.includes('fr') ? (title.fr || "Titre français") : "Titre français",
         tn: availableLanguages.includes('tn') ? (title.tn || "عنوان تونسي") : ""
       },
       image: imageResult.secure_url,
       availableLanguages: availableLanguages,
       stages: stagesData.map((stage, stageIndex) => ({
         segments: stage.segments.map((segment, segmentIndex) => {
-          // Handle audio - ensure French has content even for Tunisian-only stories
           const audio = {
-            fr: availableLanguages.includes('fr') ? (segment.audio.fr || "") : "https://example.com/placeholder-fr.mp3",
-            tn: availableLanguages.includes('tn') ? (segment.audio.tn || "") : ""
+            fr: availableLanguages.includes('fr') ? (segment.audio?.fr || "") : "https://example.com/placeholder-fr.mp3",
+            tn: availableLanguages.includes('tn') ? (segment.audio?.tn || "") : ""
           };
 
-          // Handle questions and answers
+          const questionAudio = {
+            fr: segment.question?.questionAudio?.fr || "",
+            tn: segment.question?.questionAudio?.tn || ""
+          };
+
           const questionData = {
             question: {
               fr: availableLanguages.includes('fr') ? (segment.question.question.fr || `Question ${stageIndex + 1}-${segmentIndex + 1}`) : `Question ${stageIndex + 1}-${segmentIndex + 1}`,
               tn: availableLanguages.includes('tn') ? (segment.question.question.tn || `سؤال ${stageIndex + 1}-${segmentIndex + 1}`) : ""
             },
+            questionAudio, // NEW
             answers: segment.question.answers.map((answer, answerIndex) => ({
               text: {
                 fr: availableLanguages.includes('fr') ? (answer.text.fr || `Réponse ${answerIndex + 1}`) : `Réponse ${answerIndex + 1}`,
@@ -119,7 +123,7 @@ router.post("/", upload.single("image"), async (req, res) => {
           };
 
           return {
-            audio: audio,
+            audio,
             question: questionData
           };
         })
@@ -128,10 +132,8 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     console.log("💾 Final story data to save:", JSON.stringify(storyData, null, 2));
 
-    // Validate that required fields are present
+    // Validation (unchanged, optional fields ignored)
     const validationErrors = [];
-    
-    // Check French fields if French is selected
     if (availableLanguages.includes('fr')) {
       if (!storyData.title.fr || !storyData.title.fr.trim()) {
         validationErrors.push("French title is required");
@@ -152,8 +154,6 @@ router.post("/", upload.single("image"), async (req, res) => {
         });
       });
     }
-
-    // Check Tunisian fields if Tunisian is selected
     if (availableLanguages.includes('tn')) {
       if (!storyData.title.tn || !storyData.title.tn.trim()) {
         validationErrors.push("Tunisian title is required");
@@ -192,7 +192,6 @@ router.post("/", upload.single("image"), async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error:", error);
-    
     res.status(500).json({
       success: false,
       message: error.message,

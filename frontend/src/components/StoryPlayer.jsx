@@ -4,6 +4,7 @@ import axios from "axios";
 import QuestionBox from "./QuestionBox";
 import BlueCharacter from "./FacialExpression";
 import { useLanguage } from "../context/LanguageContext";
+import { API_URL } from "../config/api.js";
 
 // Hardcoded feedback audio URLs for each language
 const FEEDBACK_AUDIO = {
@@ -12,8 +13,8 @@ const FEEDBACK_AUDIO = {
     wrong: "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1761869168/audio_autre_essai_uzag2d.mp3"
   },
   tn: {
-    correct: "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1738092922/success_tn_ocwnqe.mp3", // Add your Tunisian URLs
-    wrong: "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1738092922/try_again_tn_qkzqbj.mp3"
+    correct: "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1762629092/Copie_de_sa7it-enhanced_dbmebb.mp3", // Add your Tunisian URLs
+    wrong: "https://res.cloudinary.com/dtf3pgsd0/video/upload/v1762629098/Copie_de_ghalet_7wel_mara_okhra-enhanced_pjh7eu.mp3"
   }
 };
 
@@ -33,18 +34,42 @@ export default function StoryPlayer() {
 
   const audioRef = useRef(null);
   const feedbackAudioRef = useRef(null);
+  const fetchControllerRef = useRef(null); // <-- new: controller for fetch fallback
   const [pendingNext, setPendingNext] = useState(false);
   const [fadeOutQuestion, setFadeOutQuestion] = useState(false);
   const [canRetry, setCanRetry] = useState(false);
 
-  // Fetch single story from backend
+  // Fetch single story from backend (use API_URL) and reset player state
   useEffect(() => {
     const fetchStory = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/stories/${id}`);
+        const response = await axios.get(`${API_URL}/stories/${id}`);
         if (response.data.success) {
           console.log("📖 Story loaded:", response.data.data);
           setStory(response.data.data);
+
+          // Reset player state when a new story is loaded — avoids flicker of question box
+          setStageIndex(0);
+          setSegmentIndex(0);
+          setShowQuestion(false);
+          setFadeOutQuestion(false);
+          setFaceVisible(true);
+          setIsTalking(false);
+          setIsStoryComplete(false);
+          setPendingNext(false);
+          setCanRetry(false);
+
+          // clear any existing audio refs
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = "";
+            audioRef.current = null;
+          }
+          if (feedbackAudioRef.current) {
+            feedbackAudioRef.current.pause();
+            feedbackAudioRef.current.src = "";
+            feedbackAudioRef.current = null;
+          }
         } else {
           setError("Story not found");
         }
@@ -57,6 +82,9 @@ export default function StoryPlayer() {
     };
 
     if (id) {
+      // ensure UI reset before fetch begins to avoid transient renders
+      setLoading(true);
+      setStory(null);
       fetchStory();
     }
   }, [id]);
@@ -76,27 +104,35 @@ export default function StoryPlayer() {
     return null;
   };
 
-  // Get the correct question for current language
+  // Get the correct question for current language (plus optional question audio)
   const getQuestion = () => {
     if (!currentSegment?.question) return null;
-    
-    const question = currentSegment.question;
-    
-    if (question.question && typeof question.question === 'object') {
-      return {
-        ...question,
-        question: question.question[language] || question.question.fr || "Question",
-        answers: question.answers.map(answer => ({
-          ...answer,
-          text: answer.text[language] || answer.text.fr || answer.text || "Answer"
-        })),
-        hint: question.hint && typeof question.hint === 'object' 
-          ? question.hint[language] || question.hint.fr || question.hint
-          : question.hint
-      };
-    }
-    
-    return question;
+    const q = currentSegment.question;
+
+    const resolve = (val) => {
+      if (!val) return "";
+      if (typeof val === "string") return val;
+      if (typeof val === "object") return val[language] || val.fr || "";
+      return "";
+    };
+
+    const resolvedQuestionText = resolve(q.question);
+    const resolvedHint = resolve(q.hint);
+    const resolvedAnswers = (q.answers || []).map(a => ({
+      ...a,
+      text: resolve(a.text)
+    }));
+
+    // NEW: resolve optional question audio per language
+    const questionAudioUrl = resolve(q.questionAudio);
+
+    return {
+      ...q,
+      question: resolvedQuestionText,
+      hint: resolvedHint,
+      answers: resolvedAnswers,
+      questionAudioUrl // pass to QuestionBox
+    };
   };
 
   const isLastSegment = useMemo(() => {
@@ -107,30 +143,111 @@ export default function StoryPlayer() {
     );
   }, [stageIndex, segmentIndex, story, stage]);
 
-  // Play audio when segment changes
+  // helper to safely play a URL, with fetch-as-blob fallback
+  const loadAndPlay = async (url, audioRefTarget) => {
+    // stop any ongoing fetch for previous audio
+    if (fetchControllerRef.current) {
+      try { fetchControllerRef.current.abort(); } catch {}
+      fetchControllerRef.current = null;
+    }
+
+    // create HTMLAudioElement
+    let audio;
+    try {
+      audio = new Audio();
+      audio.src = url;
+      audioRefTarget.current = audio;
+
+      // try quick canPlayType check (not definitive but useful)
+      const canPlay = audio.canPlayType && audio.canPlayType('audio/mpeg');
+      // attempt to play directly
+      await audio.play();
+      return audio;
+    } catch (err) {
+      console.warn('⚠️ Direct audio.play() failed, trying blob fallback. Error:', err);
+      // fallback: fetch the resource and create blob URL
+      try {
+        const ac = new AbortController();
+        fetchControllerRef.current = ac;
+        const res = await fetch(url, { signal: ac.signal });
+        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+        const blob = await res.blob();
+
+        // create object URL and play
+        const blobUrl = URL.createObjectURL(blob);
+        // cleanup previous audio element
+        if (audioRefTarget.current) {
+          try { audioRefTarget.current.pause(); } catch {}
+          try { audioRefTarget.current.src = ''; } catch {}
+        }
+
+        const blobAudio = new Audio();
+        blobAudio.src = blobUrl;
+        audioRefTarget.current = blobAudio;
+
+        // when finished, revoke object URL
+        blobAudio.onended = () => {
+          try { URL.revokeObjectURL(blobUrl); } catch {}
+        };
+        await blobAudio.play();
+        return blobAudio;
+      } catch (fetchErr) {
+        console.error('❌ Audio fetch/play fallback failed:', fetchErr);
+        throw fetchErr;
+      } finally {
+        fetchControllerRef.current = null;
+      }
+    }
+  };
+
+  // Play audio when segment changes (uses loadAndPlay)
   useEffect(() => {
     const audioUrl = getAudioUrl();
     if (!audioUrl) {
       console.error("❌ No audio URL found for segment:", currentSegment);
+      setShowQuestion(true);
       return;
     }
 
     let isCurrentSegment = true;
-    const audio = new Audio(audioUrl);
-    audioRef.current = audio;
 
-    console.log("🎵 Playing audio:", audioUrl);
-
-    const playAudio = async () => {
+    const setupAndPlay = async () => {
       if (!isCurrentSegment) return;
-
       try {
         setShowQuestion(false);
         setFadeOutQuestion(false);
         setFaceVisible(true);
         setIsTalking(true);
-        await audio.play();
+        // stop previous audio if any
+        if (audioRef.current) {
+          try { audioRef.current.pause(); } catch {}
+          try { audioRef.current.src = ""; } catch {}
+        }
+        const playingAudio = await loadAndPlay(audioUrl, audioRef);
+        if (!isCurrentSegment) {
+          try { playingAudio.pause(); } catch {}
+          return;
+        }
         console.log("✅ Audio started playing");
+        // wire ended and error handlers
+        playingAudio.onended = () => {
+          if (!isCurrentSegment) return;
+          setIsTalking(false);
+          if (isLastSegment && !currentSegment.question) {
+            setIsStoryComplete(true);
+          } else {
+            setFaceVisible(false);
+            setTimeout(() => {
+              setShowQuestion(true);
+              setFadeOutQuestion(false);
+            }, 500);
+          }
+        };
+        playingAudio.onerror = (err) => {
+          console.error("❌ Audio error (playingAudio):", err);
+          setIsTalking(false);
+          setShowQuestion(true);
+        };
       } catch (err) {
         console.error("❌ Audio play error:", err, "Path:", audioUrl);
         setIsTalking(false);
@@ -138,40 +255,71 @@ export default function StoryPlayer() {
       }
     };
 
-    audio.onended = () => {
-      if (!isCurrentSegment) return;
-
-      console.log("✅ Audio ended");
-      setIsTalking(false);
-      if (isLastSegment && !currentSegment.question) {
-        setIsStoryComplete(true);
-      } else {
-        setFaceVisible(false);
-        setTimeout(() => {
-          setShowQuestion(true);
-          setFadeOutQuestion(false);
-        }, 500);
-      }
-    };
-
-    audio.onerror = (err) => {
-      console.error("❌ Audio error:", err);
-      setIsTalking(false);
-      setShowQuestion(true);
-    };
-
-    audio.load();
-    setTimeout(playAudio, 100);
+    // small delay before starting (keeps previous behavior)
+    const t = setTimeout(setupAndPlay, 100);
 
     return () => {
       isCurrentSegment = false;
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
+      clearTimeout(t);
+      // abort any fetch in progress
+      if (fetchControllerRef.current) {
+        try { fetchControllerRef.current.abort(); } catch {}
+        fetchControllerRef.current = null;
       }
-      audio.remove();
+      // cleanup audio element
+      if (audioRef.current) {
+        try { audioRef.current.pause(); } catch {}
+        try { audioRef.current.src = ""; } catch {}
+        audioRef.current = null;
+      }
     };
   }, [segmentIndex, stageIndex, currentSegment, isLastSegment, language]);
+
+  // Play feedback audio after answer, then continue story flow (use loadAndPlay)
+  const playFeedbackAudio = (url, callback) => {
+    if (!url) {
+      callback();
+      return;
+    }
+
+    let isActive = true;
+    let feedbackCleanup = null;
+
+    (async () => {
+      try {
+        // stop any previous feedback audio
+        if (feedbackAudioRef.current) {
+          try { feedbackAudioRef.current.pause(); } catch {}
+          try { feedbackAudioRef.current.src = ""; } catch {}
+          feedbackAudioRef.current = null;
+        }
+        const resolvedUrl = resolveLocalized(url) || url;
+        const playing = await loadAndPlay(resolvedUrl, feedbackAudioRef);
+        if (!isActive) {
+          try { playing.pause(); } catch {}
+          return;
+        }
+        playing.onended = () => { if (isActive) callback(); };
+        playing.onerror = () => { if (isActive) callback(); };
+        feedbackCleanup = () => {
+          try { playing.pause(); } catch {}
+          try { playing.src = ""; } catch {}
+        };
+      } catch (err) {
+        console.warn("⚠️ Feedback audio failed, continuing without it:", err);
+        if (isActive) callback();
+      }
+    })();
+
+    return () => {
+      isActive = false;
+      if (feedbackCleanup) feedbackCleanup();
+      if (fetchControllerRef.current) {
+        try { fetchControllerRef.current.abort(); } catch {}
+        fetchControllerRef.current = null;
+      }
+    };
+  };
 
   // Play feedback audio and handle answer
   const handleQuestionAnswer = (isCorrect) => {
