@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import QuestionBox from "./QuestionBox";
@@ -20,6 +20,7 @@ const FEEDBACK_AUDIO = {
 
 export default function StoryPlayer() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { language } = useLanguage();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -433,6 +434,16 @@ export default function StoryPlayer() {
     }
   }, [currentSegment, language]);
 
+  // Auto-navigate back when story completes
+  useEffect(() => {
+    if (isStoryComplete) {
+      const timer = setTimeout(() => {
+        navigate('/stories');
+      }, 3000); // Wait 3 seconds before navigating back
+      return () => clearTimeout(timer);
+    }
+  }, [isStoryComplete, navigate]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
@@ -451,11 +462,36 @@ export default function StoryPlayer() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-yellow-50 p-6 text-center">
+      {/* Exit button - top left */}
+      <button
+        onClick={() => navigate('/stories')}
+        className="fixed top-4 left-4 z-50 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full shadow-lg flex items-center space-x-2 text-sm sm:text-base font-medium transition-all"
+        aria-label="Exit story"
+      >
+        <span>←</span>
+        <span className="hidden sm:inline">{language === 'fr' ? 'Retour' : 'رجوع'}</span>
+      </button>
+
       <BlueCharacter
         showOptions={!isStoryComplete && showQuestion}
         isTalking={isTalking}
         isVisible={faceVisible || isStoryComplete}
       />
+
+      {/* Story complete message */}
+      {isStoryComplete && (
+        <div className="fixed inset-0 flex items-center justify-center z-[70] bg-black/30">
+          <div className="bg-white rounded-2xl p-8 shadow-xl text-center max-w-md mx-4">
+            <h2 className="text-2xl font-bold text-green-600 mb-4">
+              {language === 'fr' ? '🎉 Histoire terminée !' : '🎉 خلصت الحكاية !'}
+            </h2>
+            <p className="text-gray-600 mb-4">
+              {language === 'fr' ? 'Retour aux histoires...' : 'رجوع للحكايات...'}
+            </p>
+            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          </div>
+        </div>
+      )}
 
       {showQuestion && !isStoryComplete && (
         <div
