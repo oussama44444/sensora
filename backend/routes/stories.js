@@ -5,13 +5,13 @@ const storiesController = require('../controllers/stories');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const adminAuth = require('../middlewares/adminauth');
 
 router.get('/', storiesController.getAllStories);
 router.get('/:id', storiesController.getStoryById);
-router.post('/', upload.single('image'), storiesController.createStory);
-router.put('/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 100 }]), storiesController.updateStory);
-router.post('/upload-audio', upload.single('audio'), storiesController.uploadAudio);
-router.post('/upload-image', upload.single('image'), storiesController.uploadImage);
-router.delete('/:id', storiesController.deleteStory);
-
+router.post('/',adminAuth, upload.single('image'), storiesController.createStory);
+router.put('/:id',adminAuth, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 100 }]), storiesController.updateStory);
+router.post('/upload-audio',adminAuth, upload.single('audio'), storiesController.uploadAudio);
+router.post('/upload-image',adminAuth, upload.single('image'), storiesController.uploadImage);
+router.delete('/:id',adminAuth, storiesController.deleteStory);
 module.exports = router;
