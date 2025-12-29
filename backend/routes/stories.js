@@ -5,7 +5,7 @@ const storiesController = require('../controllers/stories');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const adminAuth = require('../middlewares/adminauth');
+const adminAuth = require('../middlewares/adminAuth');
 
 router.get('/', storiesController.getAllStories);
 router.get('/:id', storiesController.getStoryById);
