@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
-const api = axios.create({ baseURL: `${BACKEND_URL}/api/stories` });
+const BACKEND_URL = process.env.BACKEND_URL || 'http://192.168.1.6:5000';
+const api = axios.create({ baseURL: `${BACKEND_URL}/stories` });
 
 const authHeader = (token) => (token ? { Authorization: `Bearer ${token}` } : {});
 
@@ -238,10 +238,14 @@ export const getStoriesLocal = async (language = 'fr') => {
 //     createdBy: "admin_id" // Admin who created the story
 //   }
 // ]
-export const getStories = async (token) => {
-  const res = await api.get('/', { headers: authHeader(token) });
+export const getStories = async (language, token) => {
+  const res = await api.get('/', {
+    params: { language },
+    headers: authHeader(token),
+  });
   return res.data;
 };
+
 
 // TODO: BACKEND ENDPOINT - GET /api/stories/:id
 // Description: Fetch single story details

@@ -23,52 +23,49 @@ export const profileResetPassword = async (payload) => {
 };
 
 export const updateUserProfile = async (formData, token) => {
- 	const res = await profileApi.put('/updateuser', formData, {
- 		headers: { ...authHeader(token), 'Content-Type': 'multipart/form-data' },
- 	});
+	const headers = { ...authHeader(token) };
+	// If sending FormData, use multipart; otherwise default to JSON
+	if (typeof FormData !== 'undefined' && formData instanceof FormData) {
+		headers['Content-Type'] = 'multipart/form-data';
+	} else {
+		headers['Content-Type'] = 'application/json';
+	}
+
+	const res = await profileApi.put('/updateuser', formData, { headers });
  	return res.data;
 };
 
 
 export const login = async (credentials) => {
-	// Hardcoded login for testing
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve({
-				success: true,
-				token: 'fake-jwt-token-12345',
-				user: {
-					id: '1',
-					name: 'Test User',
-					email: credentials.email,
-					phone: '+216 20 123 456',
-					age: 25,
-					avatar: '🦁',
-				},
-			});
-		}, 500);
-	});
+	try {
+		const res = await api.post('/login', credentials);
+		return res.data;
+	} catch (err) {
+		console.error('[userService.login] request failed', {
+			url: api.defaults.baseURL + '/login',
+			payload: credentials,
+			status: err.response?.status,
+			responseData: err.response?.data,
+			message: err.message,
+		});
+		throw err;
+	}
 };
 
 export const register = async (data) => {
-	// Hardcoded register for testing
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve({
-				success: true,
-				message: 'Compte créé avec succès',
-				token: 'fake-jwt-token-12345',
-				user: {
-					id: '1',
-					name: data.name,
-					email: data.email,
-					phone: data.phone || '',
-					age: data.age || 0,
-					avatar: '🦁',
-				},
-			});
-		}, 500);
-	});
+	try {
+		const res = await api.post('/register', data);
+		return res.data;
+	} catch (err) {
+		console.error('[userService.register] request failed', {
+			url: api.defaults.baseURL + '/register',
+			payload: data,
+			status: err.response?.status,
+			responseData: err.response?.data,
+			message: err.message,
+		});
+		throw err;
+	}
 };
 
 export const forgetPassword = async (payload) => {

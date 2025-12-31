@@ -7,6 +7,9 @@ const storySchema = new mongoose.Schema({
   },
   image: { type: String, required: true },
   availableLanguages: [{ type: String, enum: ['fr', 'tn'] }],
+  description : {type: String, required: false, default: "" },
+  isPremium: { type: Boolean, default: false },
+  difficultyLevel: { type: String, enum: ['easy', 'medium', 'hard'], default: 'easy' },
   stages: [{
     segments: [{
       audio: {

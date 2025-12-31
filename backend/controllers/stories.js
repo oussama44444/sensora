@@ -2,7 +2,10 @@ const storiesService = require('../services/stories');
 
 const getAllStories = async (req, res) => {
   try {
-    const result = await storiesService.getAllStories();
+    console.log('Get all stories request, query params:', req.query);
+    const language = req.query.language || 'fr';
+    console.log('Fetching stories for language:', language);
+    const result = await storiesService.getAllStories(language);
     res.json({ success: true, count: result.count, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

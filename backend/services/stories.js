@@ -1,10 +1,17 @@
 const cloudinary = require('../config/cloudinary');
 const Story = require('../models/story');
 
-async function getAllStories() {
-  const stories = await Story.find().sort({ createdAt: -1 });
+async function getAllStories(language) {
+  const stories = await Story
+    .find(
+      { availableLanguages: language }, // match language inside array
+      "title image availableLanguages difficultyLevel isPremium description createdAt"
+    )
+    .sort({ createdAt: -1 });
+
   return { count: stories.length, data: stories };
 }
+
 
 async function getStoryById(id) {
   return await Story.findById(id);
@@ -22,6 +29,9 @@ async function createStory({ file, body }) {
   const title = JSON.parse(body.title);
   const availableLanguages = JSON.parse(body.availableLanguages);
   const stagesData = JSON.parse(body.stages);
+  const difficultyLevel = JSON.parse(body.difficultyLevel) || 'easy';
+  const isPremium = JSON.parse(body.isPremium) || false;
+  const description = JSON.parse(body.description) || "";
 
   const imageResult = await uploadToCloudinary(file, { folder: 'stories/images' });
 
@@ -32,6 +42,9 @@ async function createStory({ file, body }) {
     },
     image: imageResult.secure_url,
     availableLanguages: availableLanguages,
+    isPremium: isPremium,
+    difficultyLevel: difficultyLevel,
+    description: description,
     stages: stagesData.map((stage, stageIndex) => ({
       segments: stage.segments.map((segment, segmentIndex) => {
         const audio = {
@@ -127,8 +140,17 @@ async function updateStory(id, { files, body }) {
   if (body.availableLanguages) {
     try { availableLanguages = JSON.parse(body.availableLanguages); } catch (e) { availableLanguages = body.availableLanguages; }
   }
+  if (body.difficultyLevel) {
+    try { story.difficultyLevel = JSON.parse(body.difficultyLevel); } catch (e) { /* keep existing */ }
+  }
+  if (body.isPremium) {
+    try { story.isPremium = JSON.parse(body.isPremium); } catch (e) { /* keep existing */ }
+  }
   if (body.stages) {
     try { stagesData = JSON.parse(body.stages); } catch (e) { stagesData = body.stages; }
+  }
+  if (body.description) {
+    try { story.description = JSON.parse(body.description); } catch (e) { /* keep existing */ }
   }
 
   if (files && files.audio && files.audio.length > 0) {

@@ -76,7 +76,7 @@ const ProfileContent = ({ onLogout }) => {
 
           {/* User Info */}
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user?.name || 'Petit Explorateur'}</Text>
+            <Text style={styles.userName}>{user?.firstName + ' ' + user?.lastName || 'Petit Explorateur'}</Text>
             <Text style={styles.userEmail}>{user?.email || 'explorer@sensaura.com'}</Text>
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>⭐ {t.profile.level} 3 - {t.profile.adventurer}</Text>

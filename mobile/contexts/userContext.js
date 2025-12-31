@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { userService } from '../services/userService';
-import notificationService from '../services/notificationService';
+import userService from '../services/userService';
+//import notificationService from '../services/notificationService';
 
 const UserContext = createContext(null);
 
@@ -19,10 +19,10 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const loadAuth = async () => {
       try {
-        const storedUserToken = await AsyncStorage.getItem('padel_user_token');
+        const storedUserToken = await AsyncStorage.getItem('authToken');
 
         if (storedUserToken) {
-          const storedUser = await AsyncStorage.getItem('padel_user_user');
+          const storedUser = await AsyncStorage.getItem('user');
           setToken(storedUserToken);
           setUserToken(storedUserToken);
           setUser(JSON.parse(storedUser));
@@ -62,7 +62,7 @@ export const UserProvider = ({ children }) => {
       
       // Remove push notification token from backend
       try {
-        await notificationService.removeTokenFromBackend();
+        //await notificationService.removeTokenFromBackend();
         console.log("✅ Push notification token removed");
       } catch (notifError) {
         console.warn("⚠️ Failed to remove notification token:", notifError);
@@ -70,10 +70,8 @@ export const UserProvider = ({ children }) => {
       }
       
       await AsyncStorage.multiRemove([
-        'padel_user_token',
-        'padel_user_user',
-        'padel_owner_token',
-        'padel_owner_user',
+        'authToken',
+        'user',
       ]);
     } catch (error) {
       console.error('Logout error:', error);
@@ -99,6 +97,7 @@ export const UserProvider = ({ children }) => {
   // 🔹 Update Profile (used by HandPopup and any edit profile screen)
     const updateProfile = async (updatedFields) => {
       try {
+        console.log('Updating profile with fields:', updatedFields);
         if (!user) return;
 
         let dataToSend = updatedFields;
@@ -121,23 +120,16 @@ export const UserProvider = ({ children }) => {
         }
 
         // Send to backend
-        const response = await userService.updateProfile(token, dataToSend, {
-          headers: {
-            'Content-Type': dataToSend instanceof FormData ? 'multipart/form-data' : 'application/json',
-          },
-        });
-
+        // use the correct service function and argument order
+        const response = await userService.updateUserProfile(dataToSend, token);
+        console.log('Profile updated successfully:', response);
         // Use server response.user instead of optimistic merge
         const updatedUserFromServer = response.user;
 
         setUser(updatedUserFromServer);
 
-        if (role === 'user') {
-          await AsyncStorage.setItem('padel_user_user', JSON.stringify(updatedUserFromServer));
-        } else {
-          await AsyncStorage.setItem('padel_owner_user', JSON.stringify(updatedUserFromServer));
-        }
-
+          await AsyncStorage.setItem('user', JSON.stringify(updatedUserFromServer));
+         
         return { success: true, user: updatedUserFromServer };
       } catch (err) {
         console.error('Error updating profile:', err);

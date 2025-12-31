@@ -7,11 +7,7 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   phone: { type: String, default: '' },
   role: { type: String, enum: ['admin', 'user'], default: 'user' },
-
-
-
-
-
+  age: { type: Number, default: 0 },
   // ==================== IMAGE ====================
   image: {
     type: String,

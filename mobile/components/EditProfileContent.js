@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
+import {useUser}  from '../contexts/userContext';
 
 const EditProfileContent = ({ navigation }) => {
-  const { user, updateUser } = useAuth();
-  
-  const [name, setName] = useState(user?.name || '');
+  const { user,} = useAuth();
+  const {updateProfile} = useUser();
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [age, setAge] = useState(user?.age?.toString() || '');
@@ -22,7 +24,12 @@ const EditProfileContent = ({ navigation }) => {
 
   const handleSave = async () => {
     // Validation
-    if (!name.trim()) {
+    if (!firstName.trim()) {
+      Alert.alert('Erreur', 'Le prénom est requis');
+      return;
+    }
+
+    if (!lastName.trim()) {
       Alert.alert('Erreur', 'Le nom est requis');
       return;
     }
@@ -39,21 +46,19 @@ const EditProfileContent = ({ navigation }) => {
     }
 
     setSaving(true);
+    try {
+      const updatedData = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        age: parseInt(age, 10) || 0,
+        //avatar: selectedAvatar,
+      };
 
-    // Update user data
-    const updatedData = {
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      age: parseInt(age) || 0,
-      avatar: selectedAvatar,
-    };
-
-    const result = await updateUser(updatedData);
-    
-    setTimeout(() => {
-      setSaving(false);
-      if (result.success) {
+      const result = await updateProfile(updatedData);
+      console.log('updateProfile result:', result);
+      if (result && result.success) {
         Alert.alert(
           'Succès ! 🎉',
           'Votre profil a été mis à jour avec succès.',
@@ -67,7 +72,12 @@ const EditProfileContent = ({ navigation }) => {
       } else {
         Alert.alert('Erreur', 'Impossible de mettre à jour le profil');
       }
-    }, 1500);
+    } catch (error) {
+      console.error('updateProfile error:', error);
+      Alert.alert('Erreur', 'Impossible de mettre à jour le profil');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const avatarOptions = [
@@ -123,13 +133,24 @@ const EditProfileContent = ({ navigation }) => {
       <View style={styles.form}>
         {/* Name */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nom complet</Text>
+          <Text style={styles.label}>Prénom</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez votre prénom"
+            placeholderTextColor="#9CA3AF"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+
+        </View>
+                <View style={styles.inputGroup}>
+          <Text style={styles.label}>Nom</Text>
           <TextInput
             style={styles.input}
             placeholder="Entrez votre nom"
             placeholderTextColor="#9CA3AF"
-            value={name}
-            onChangeText={setName}
+            value={lastName}
+            onChangeText={setLastName}
           />
         </View>
 

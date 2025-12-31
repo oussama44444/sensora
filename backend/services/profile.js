@@ -11,7 +11,7 @@ const accountVerifTokenModel = require("../models/accountveriftoken");
 
   exports.updateuser = async (req, res) => {
     try {
-      const { firstName, lastName, phone, address, notif_token, hand } = req.body;
+      const { firstName, lastName, phone, address, notif_token, age } = req.body;
       //console.log('req.body:', req.body);
       //console.log('req.file:', req.file);
       // multer may return everything as string already
@@ -23,13 +23,13 @@ const accountVerifTokenModel = require("../models/accountveriftoken");
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (phone) user.phone = phone;
+      if (age) user.age = age;
       if (address) user.address = address;
-      if (hand) user.hand = hand;
       if (notif_token) user.notif_token = notif_token;
       if (req.file) user.image = req.file.path;
 
       await user.save();
-      res.status(200).json({ message: "User info updated successfully", user });
+      res.status(200).json({ message: "User info updated successfully", user , success: true});
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });

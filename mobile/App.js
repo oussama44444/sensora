@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import * as NavigationBar from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
+import { UserProvider } from "./contexts/userContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -243,6 +244,7 @@ export default function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
+        <UserProvider>
         <StoriesProvider>
           <SubscriptionProvider>
             <NavigationContainer>
@@ -251,6 +253,7 @@ export default function App() {
             </NavigationContainer>
           </SubscriptionProvider>
         </StoriesProvider>
+        </UserProvider>
       </AuthProvider>
     </LanguageProvider>
   );
