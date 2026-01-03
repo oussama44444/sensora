@@ -13,7 +13,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "https://i.pinimg.com/474x/51/f6/fb/51f6fb256629fc755b8870c801092942.jpg"
   },
-
+  premium: { type: Boolean, default: false },
+  subscriptionDate: { type: Date, default: null },
+  subscriptionEndDate: { type: Date, default: null },
 
   verified: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },

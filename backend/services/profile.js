@@ -225,9 +225,12 @@ exports.verifyemail = async (userId, token) => {
 
 exports.getalldata = async (req, res) => {
   try {
-    const userId = req.user._id;
-    console.log(userId);
-    const user = await userModel.findById(userId);
+    const userId = req.user.userId;
+
+    const user = await userModel
+      .findById(userId)
+      .select("-password"); 
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -238,6 +241,7 @@ exports.getalldata = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 exports.deleteaccount = async (userId) => {
   try {

@@ -1,15 +1,36 @@
 const cloudinary = require('../config/cloudinary');
 const Story = require('../models/story');
 
-async function getAllStories(language) {
-  const stories = await Story
-    .find(
-      { availableLanguages: language }, // match language inside array
-      "title image availableLanguages difficultyLevel isPremium description createdAt"
-    )
-    .sort({ createdAt: -1 });
+async function getAllStories(language, page = 1, limit = 20, includePremium = true) {
+  // ensure numeric values
+  const p = Math.max(1, parseInt(page, 10) || 1);
+  const l = Math.max(1, parseInt(limit, 10) || 20);
+  const filter = { availableLanguages: language };
+  if (!includePremium) {
+    filter.isPremium = false;
+  }
 
-  return { count: stories.length, data: stories };
+  // total count for pagination
+  const total = await Story.countDocuments(filter);
+
+  const stories = await Story
+    .find(filter, "title image availableLanguages difficultyLevel isPremium description createdAt points")
+    .sort({ createdAt: -1 })
+    .skip((p - 1) * l)
+    .limit(l);
+
+  const totalPages = Math.max(1, Math.ceil(total / l));
+
+  return {
+    count: stories.length,
+    data: stories,
+    pagination: {
+      page: p,
+      limit: l,
+      total,
+      totalPages,
+    },
+  };
 }
 
 

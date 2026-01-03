@@ -257,7 +257,7 @@ export default function App() {
         <StoriesProvider>
           <SubscriptionProvider>
             <NavigationContainer>
-              <StatusBar hidden={true} />
+          
               <Navigation />
             </NavigationContainer>
           </SubscriptionProvider>

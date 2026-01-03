@@ -7,8 +7,10 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { InteractionManager } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStories } from '../contexts/StoriesContext';
+import { useUser } from '../contexts/userContext';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales';
@@ -18,8 +20,8 @@ import StoryDetailsModal from './StoryDetailsModal';
 
 const StoriesListContent = () => {
   const navigation = useNavigation();
-  const { stories } = useStories();
-  const { isSubscribed } = useSubscription();
+  const { stories, refreshStories, page, totalPages, nextPage, prevPage } = useStories();
+  const { user, logout, token, getProfileAllData } = useUser();
   const { language } = useLanguage();
   const t = getTranslation(language);
   const [filter, setFilter] = useState('all');
@@ -42,21 +44,32 @@ const StoriesListContent = () => {
       : 'Cette histoire aide votre enfant à développer des compétences de communication et de compréhension sociale à travers des situations amusantes de la vie quotidienne.'),
   });
 
+
   const handleStoryPress = (story) => {
-    // Check if story is premium and user is not subscribed
-    if (story.isPremium && !isSubscribed) {
-      setShowPremiumModal(true);
+    // If story is premium, prevent non-premium users from opening it
+    if (story?.isPremium && !(user && user.isPremium)) {
+      const title = language === 'fr' ? 'Contenu premium' : 'محتوى متميّز';
+      const message = language === 'fr'
+        ? "Cette histoire est réservée aux utilisateurs premium. Voulez-vous mettre à niveau ?"
+        : 'هالحكاية للمشتركين المتميّزين فقط. تحب تطوّر اشتراكك؟';
+      Alert.alert(
+        title,
+        message,
+        [
+          { text: language === 'fr' ? 'Annuler' : 'إلغاء', style: 'cancel' },
+          { text: language === 'fr' ? 'Mettre à niveau' : 'طوّر الاشتراك', onPress: () => navigation.navigate('Subscription') }
+        ]
+      );
       return;
     }
 
-    const enhancedStory = enhanceStoryWithDetails(story);
-    setSelectedStory(enhancedStory);
-    setIsModalVisible(true);
+    // navigate directly with the story id to avoid passing large objects
+    navigation.navigate('StoryPlayer', { storyId: story?.id || story?._id });
   };
 
   const handleStartStory = () => {
     setIsModalVisible(false);
-    navigation.navigate('StoryPlayer', { story: selectedStory });
+    navigation.navigate('StoryPlayer', { storyId: selectedStory?.id });
   };
 
   const handleCloseModal = () => {
@@ -167,12 +180,26 @@ const StoriesListContent = () => {
               <StoryCard
                 story={story}
                 onPress={() => handleStoryPress(story)}
-                isLocked={story.isPremium && !isSubscribed}
+                isLocked={story.isPremium && !(user && user.isPremium)}
               />
             </View>
           ))}
         </View>
       </ScrollView>
+
+      {/* Pagination controls */}
+      <View style={styles.paginationRow}>
+        <TouchableOpacity onPress={prevPage} style={styles.pageButton} disabled={page <= 1}>
+          <Text style={{ opacity: page <= 1 ? 0.4 : 1 }}>Prev</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageInfo}>{page} / {totalPages}</Text>
+        <TouchableOpacity onPress={nextPage} style={styles.pageButton} disabled={page >= totalPages}>
+          <Text style={{ opacity: page >= totalPages ? 0.4 : 1 }}>Next</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => refreshStories(page)} style={styles.pageButton}>
+          <Text>Refresh</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Premium Modal */}
       <PremiumModal
@@ -181,13 +208,14 @@ const StoriesListContent = () => {
         onSubscribe={handleSubscribePress}
       />
 
-      {/* Story Details Modal */}
+      {/* Story Details Modal 
       <StoryDetailsModal
         visible={isModalVisible}
         story={selectedStory}
         onClose={handleCloseModal}
         onStart={handleStartStory}
       />
+      */}
     </View>
   );
 };
@@ -282,6 +310,27 @@ const styles = StyleSheet.create({
   cardWrapper: {
     width: '23%',
     marginBottom: 4,
+  },
+  paginationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+  },
+  pageButton: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  pageInfo: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#374151',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,54 +7,63 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  AppState,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/userContext';
 import { useStories } from '../contexts/StoriesContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales';
 import StoryCard from './StoryCard';
 import DashboardStats from './DashboardStats';
 import StoryDetailsModal from './StoryDetailsModal';
-import { getProfileAllData } from '../services/userService';
 
 const HomeContent = () => {
   const navigation = useNavigation();
-  const { user, logout, token } = useAuth();
+  const { user, logout, token, getProfileAllData } = useUser();
   const { stories, completedStories, suggestedStories } = useStories();
   const { language } = useLanguage();
   const t = getTranslation(language);
   const [activeTab, setActiveTab] = useState('suggestions');
-  const [userName, setUserName] = useState(user?.name || '');
+  const [userName, setUserName] = useState(
+    user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : ''
+  );
   const [loadingName, setLoadingName] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const appStateRef = useRef(AppState.currentState);
 
+  // Fetch and log profile on mount and when app becomes active
   useEffect(() => {
-    const fetchUserName = async () => {
-      if (token && !userName) {
-        setLoadingName(true);
-        try {
-          const data = await getProfileAllData(token);
-          // The API returns the user object directly
-          if (data && (data.firstName || data.name)) {
-            const fullName = data.name || `${data.firstName || ''} ${data.lastName || ''}`.trim();
-            setUserName(fullName);
-          }
-        } catch (error) {
-          console.error('Error fetching user name:', error);
-          // Fallback to user from context if API fails
-          if (user?.name) {
-            setUserName(user.name);
-          }
-        } finally {
-          setLoadingName(false);
+
+    const fetchProfile = async () => {
+      if (!token || !getProfileAllData) return;
+      setLoadingName(true);
+      try {
+        const data = await getProfileAllData(token);
+        console.log('Fetched user profile data (from context):', data);
+        if (data && (data.firstName || data.lastName)) {
+          const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+          setUserName(fullName);
         }
+      } catch (err) {
+        console.error('Error fetching profile via context:', err);
+      } finally {
+        setLoadingName(false);
       }
     };
 
-    fetchUserName();
-  }, [token]);
+    fetchProfile();
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+        fetchProfile();
+      }
+      appStateRef.current = nextAppState;
+    });
+
+    return () => subscription.remove();
+  }, [token, ]);
 
   const currentStreak = 3;
   const totalPoints = completedStories.length * 10 + completedStories.reduce((sum, story) => sum + (story.points || 0), 0);
@@ -72,14 +81,31 @@ const HomeContent = () => {
   });
 
   const handleStoryPress = (story) => {
-    const enhancedStory = enhanceStoryWithDetails(story);
-    setSelectedStory(enhancedStory);
-    setIsModalVisible(true);
+    // If story is premium, prevent non-premium users from opening it
+    if (story?.isPremium && !(user && user.isPremium)) {
+      const title = language === 'fr' ? 'Contenu premium' : 'محتوى متميّز';
+      const message = language === 'fr'
+        ? "Cette histoire est réservée aux utilisateurs premium. Voulez-vous mettre à niveau ?"
+        : 'هالحكاية للمشتركين المتميّزين فقط. تحب تطوّر اشتراكك؟';
+      Alert.alert(
+        title,
+        message,
+        [
+          { text: language === 'fr' ? 'Annuler' : 'إلغاء', style: 'cancel' },
+          { text: language === 'fr' ? 'Mettre à niveau' : 'طوّر الاشتراك', onPress: () => navigation.navigate('Subscription') }
+        ]
+      );
+      return;
+    }
+
+    // navigate directly with the story id to avoid passing large objects
+    navigation.navigate('StoryPlayer', { storyId: story?.id || story?._id });
   };
 
   const handleStartStory = () => {
     setIsModalVisible(false);
-    navigation.navigate('StoryPlayer', { story: selectedStory });
+    // modal may have set `selectedStory` as an object; prefer id
+    navigation.navigate('StoryPlayer', { storyId: selectedStory?.id || selectedStory?._id });
   };
 
   const handleCloseModal = () => {
@@ -164,6 +190,7 @@ const HomeContent = () => {
                       <StoryCard
                         story={story}
                         onPress={() => handleStoryPress(story)}
+                        isLocked={story.isPremium && !(user && user.isPremium)} 
                       />
                     </View>
                 ))}
@@ -198,13 +225,14 @@ const HomeContent = () => {
 
       <View style={styles.bottomPadding} />
 
-      {/* Story Details Modal */}
+      {/* Story Details Modal 
       <StoryDetailsModal
         visible={isModalVisible}
         story={selectedStory}
         onClose={handleCloseModal}
         onStart={handleStartStory}
       />
+      */}
     </ScrollView>
   );
 };

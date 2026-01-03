@@ -95,28 +95,24 @@ const QuestionScreen = ({
       </View>
 
       {/* Hint Modal */}
-      <Modal
-        visible={showHint}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={onCloseHint}
-        statusBarTranslucent={true}
-      >
-        <View style={styles.modalOverlay}>
+      {showHint && (
+        <View style={styles.modalOverlay} pointerEvents="auto">
           <View style={styles.hintModal}>
             <TouchableOpacity style={styles.hintCloseButton} onPress={onCloseHint}>
               <Text style={styles.hintCloseButtonText}>✕</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.hintHeader}>
               <Text style={styles.hintIcon}>💡</Text>
               <Text style={styles.hintModalTitle}>{t.question.hint}</Text>
             </View>
-            
-            <Text style={styles.hintModalText}>{currentQuestion.hint}</Text>
+
+            <ScrollView contentContainerStyle={styles.hintScroll}>
+              <Text style={styles.hintModalText}>{String(currentQuestion.hint || '')}</Text>
+            </ScrollView>
           </View>
         </View>
-      </Modal>
+      )}
     </Animated.View>
   );
 };
@@ -269,25 +265,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    zIndex: 999,
   },
   hintModal: {
     backgroundColor: '#FFF9F0',
     borderRadius: 28,
-    padding: 28,
-    width: '90%',
-    maxWidth: 400,
+    padding: 20,
+    width: '92%',
+    maxWidth: 520,
+    maxHeight: '70%',
     borderWidth: 5,
     borderColor: '#FFD54F',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
-    elevation: 10,
+    elevation: 12,
+  },
+  hintScroll: {
+    paddingVertical: 8,
   },
   hintCloseButton: {
     position: 'absolute',

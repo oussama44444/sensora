@@ -25,6 +25,9 @@ export default function StoryPlayer() {
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const localUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null;
+  const isUserPremium = !!(localUser && localUser.isPremium);
+  const [locked, setLocked] = useState(false);
 
   const [stageIndex, setStageIndex] = useState(0);
   const [segmentIndex, setSegmentIndex] = useState(0);
@@ -47,6 +50,7 @@ export default function StoryPlayer() {
         const response = await axios.get(`${API_URL}/stories/${id}`);
         if (response.data.success) {
           console.log("📖 Story loaded:", response.data.data);
+          setLocked(false);
           setStory(response.data.data);
 
           // Reset player state when a new story is loaded — avoids flicker of question box
@@ -76,7 +80,13 @@ export default function StoryPlayer() {
         }
       } catch (err) {
         console.error("Error fetching story:", err);
-        setError("Could not load story");
+        // If backend responds with 403, mark as locked so UI can show upgrade prompt
+        if (err?.response?.status === 403) {
+          setLocked(true);
+          setError(err.response?.data?.message || "Premium content. Upgrade to access.");
+        } else {
+          setError("Could not load story");
+        }
       } finally {
         setLoading(false);
       }
@@ -455,7 +465,18 @@ export default function StoryPlayer() {
   if (error || !story) {
     return (
       <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
-        <div className="text-xl text-red-600">{error || "Story not found"}</div>
+        {locked ? (
+          <div className="text-center max-w-md">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{language === 'fr' ? 'Contenu premium' : 'محتوى متميّز'}</h2>
+            <p className="text-gray-700 mb-6">{language === 'fr' ? 'Cette histoire est réservée aux utilisateurs premium. Veuillez mettre à niveau pour y accéder.' : 'هالحكاية للمشتركين المتميّزين فقط. رجاءً طوّر اشتراكك للوصول.'}</p>
+            <div className="flex justify-center space-x-4">
+              <button onClick={() => navigate('/stories')} className="px-4 py-2 bg-sky-600 text-white rounded">{language === 'fr' ? 'Retour' : 'رجوع'}</button>
+              <button onClick={() => window.location.href = '/upgrade'} className="px-4 py-2 bg-yellow-500 text-white rounded">{language === 'fr' ? 'Mettre à niveau' : 'طوّر الاشتراك'}</button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-xl text-red-600">{error || "Story not found"}</div>
+        )}
       </div>
     );
   }

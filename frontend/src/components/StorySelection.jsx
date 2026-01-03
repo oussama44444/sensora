@@ -10,7 +10,9 @@ export default function StorySelection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { language } = useLanguage();
-  
+  // Try to read current user (may be null). Expect shape: { isPremium: true }
+  const localUser = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null;
+  const isUserPremium = !!(localUser && localUser.isPremium);
   // Get translations based on current language
   const t = language === 'fr' ? frenchTranslations : tunisianTranslations;
 
@@ -116,19 +118,24 @@ export default function StorySelection() {
       ) : (
         <div className="w-full max-w-6xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredStories.map((story, index) => (
+            {filteredStories.map((story, index) => {
+              const locked = !!(story.isPremium && !isUserPremium);
+              return (
               <div
                 key={story._id || index}
-                onClick={() => navigate(`/story/${story._id}`)}
-                className="bg-white shadow-lg sm:shadow-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                onClick={() => { if (!locked) navigate(`/story/${story._id}`); }}
+                className={`relative bg-white shadow-lg sm:shadow-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-transform duration-200 ${locked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'}`}
               >
                 {/* Story Image */}
-                <div className="mb-3 sm:mb-4">
+                <div className="mb-3 sm:mb-4 relative">
                   <img 
                     src={story.image} 
                     alt={story.title?.[language] || story.title?.fr || story.title} 
                     className="w-full h-32 sm:h-40 lg:h-48 object-cover rounded-lg sm:rounded-xl" 
                   />
+                  {story.isPremium && (
+                    <div className="absolute top-4 right-4 bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full text-xs font-semibold">Premium</div>
+                  )}
                 </div>
                 
                 {/* Story Title */}
@@ -145,8 +152,23 @@ export default function StorySelection() {
                     <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">🇹🇳</span>
                   )}
                 </div>
+
+                {/* Lock overlay if story is premium and user isn't */}
+                {story.isPremium && !isUserPremium && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/30 w-full h-full rounded-xl"></div>
+                    <div className="absolute text-white text-lg font-bold flex items-center space-x-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4 9 5.567 9 7.5 10.343 11 12 11z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11v8a2 2 0 002 2h10a2 2 0 002-2v-8" />
+                      </svg>
+                      <span>{language === 'fr' ? 'Premium' : 'محوّز'}</span>
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

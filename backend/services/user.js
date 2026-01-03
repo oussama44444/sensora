@@ -72,7 +72,9 @@ exports.login = async (req, res) => {
       email: user.email,
       firstName: user.firstName ,
       lastName :user.lastName,
-      role: role
+      role: role,
+      isPremium: user.isPremium || false
+
     };
 
     const token = jwt.sign(payload, secretKey);
@@ -89,7 +91,8 @@ exports.login = async (req, res) => {
         lastName :user.lastName,
         role: role,
         hand:user.hand,
-        image:user.image
+        image:user.image,
+        isPremium: user.isPremium || false
       },
       success: true
     });
